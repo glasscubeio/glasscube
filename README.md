@@ -1,0 +1,1 @@
+this is my portfolio, tried to make it look like a terminal because terminal is sufficient enough to be a perfect interface to do anything.
