@@ -9,8 +9,11 @@ interface HomeProps {
 const STACK = ["TypeScript", "Go", "Rust", "Bun.js", "PostgreSQL", "React"];
 const SOCIAL = [
   { label: "GitHub", href: "https://github.com/nodiry" },
-  { label: "LinkedIn", href: "#" },
-  { label: "Telegram", href: "#" },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/nodirbek-bokiev",
+  },
+  { label: "Telegram", href: "https://t.me/RBNNB" },
 ];
 
 export default function HomeSection({ lang }: HomeProps) {
@@ -116,7 +119,7 @@ export default function HomeSection({ lang }: HomeProps) {
           {/* Action buttons */}
           <div className="flex flex-wrap gap-2 stagger-4">
             <a
-              href="public/이력서.hwpx"
+              href="resume.pdf"
               download
               className="btn-glow primary flex-1 text-center"
               style={{ textDecoration: "none" }}
@@ -124,7 +127,7 @@ export default function HomeSection({ lang }: HomeProps) {
               ↓ {t.resumeBtn}
             </a>
             <a
-              href="public/자기소개서.hwpx"
+              href="자기소개서.hwpx"
               download
               className="btn-glow flex-1 text-center"
               style={{ textDecoration: "none" }}
