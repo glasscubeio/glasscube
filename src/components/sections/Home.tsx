@@ -8,7 +8,7 @@ interface HomeProps {
 
 const STACK = ["TypeScript", "Go", "Rust", "Bun.js", "PostgreSQL", "React"];
 const SOCIAL = [
-  { label: "GitHub",   href: "https://github.com/nodiry" },
+  { label: "GitHub", href: "https://github.com/nodiry" },
   { label: "LinkedIn", href: "#" },
   { label: "Telegram", href: "#" },
 ];
@@ -17,20 +17,18 @@ export default function HomeSection({ lang }: HomeProps) {
   const t = HOME_CONTENT[lang];
 
   return (
-    <div className="relative w-full h-full overflow-y-auto" style={{ background: "var(--c-bg)" }}>
+    <div
+      className="relative w-full h-full overflow-y-auto"
+      style={{ background: "var(--c-bg)" }}
+    >
       <GridBg vignette />
 
-      <div className="relative z-10 flex flex-col lg:flex-row gap-8 p-6 lg:p-8 max-w-5xl mx-auto min-h-full">
-
+      <div className="relative z-10 flex flex-col lg:flex-row gap-8 p-6 lg:p-8 max-w-5xl mx-auto min-h-full pb-20 lg:pb-8">
         {/* ── Left column ── */}
         <div className="flex flex-col gap-5 lg:w-80 shrink-0">
-
           {/* Profile photo */}
           <div className="stagger-1 flex justify-center lg:justify-start">
-            <div
-              className="relative"
-              style={{ width: 120, height: 120 }}
-            >
+            <div className="relative" style={{ width: 120, height: 120 }}>
               {/* Glow ring */}
               <div
                 style={{
@@ -38,7 +36,8 @@ export default function HomeSection({ lang }: HomeProps) {
                   inset: -3,
                   borderRadius: "50%",
                   border: "1px solid var(--c-border)",
-                  boxShadow: "0 0 16px rgba(0,255,65,0.2), inset 0 0 12px rgba(0,255,65,0.06)",
+                  boxShadow:
+                    "0 0 16px rgba(0,255,65,0.2), inset 0 0 12px rgba(0,255,65,0.06)",
                 }}
               />
               <img
@@ -97,8 +96,8 @@ export default function HomeSection({ lang }: HomeProps) {
 
           {/* Meta items */}
           <div
-            className="glass-panel p-3.5 flex flex-col gap-2 stagger-3"
-            style={{ fontSize: "0.68rem", fontFamily: "var(--font-mono)" }}
+            className="glass-panel p-3.5 flex flex-col gap-2.5 stagger-3"
+            style={{ fontSize: "0.73rem", fontFamily: "var(--font-mono)" }}
           >
             {[
               { icon: "📍", text: t.location },
@@ -117,12 +116,20 @@ export default function HomeSection({ lang }: HomeProps) {
           {/* Action buttons */}
           <div className="flex flex-wrap gap-2 stagger-4">
             <a
-              href="/resume.pdf"
+              href="public/이력서.hwpx"
               download
               className="btn-glow primary flex-1 text-center"
-              style={{ textDecoration: "none", display: "block" }}
+              style={{ textDecoration: "none" }}
             >
               ↓ {t.resumeBtn}
+            </a>
+            <a
+              href="public/자기소개서.hwpx"
+              download
+              className="btn-glow flex-1 text-center"
+              style={{ textDecoration: "none" }}
+            >
+              ↓ {t.coverLetterBtn}
             </a>
           </div>
 
@@ -144,11 +151,13 @@ export default function HomeSection({ lang }: HomeProps) {
         </div>
 
         {/* ── Vertical divider ── */}
-        <div className="hidden lg:block self-stretch" style={{ width: 1, background: "var(--c-border-dim)" }} />
+        <div
+          className="hidden lg:block self-stretch"
+          style={{ width: 1, background: "var(--c-border-dim)" }}
+        />
 
         {/* ── Right column: terminal output ── */}
         <div className="flex-1 flex flex-col gap-4">
-
           {/* Terminal header */}
           <div
             className="glass-panel px-4 py-2 flex items-center gap-3 stagger-1 shrink-0"
@@ -156,12 +165,25 @@ export default function HomeSection({ lang }: HomeProps) {
           >
             <div className="flex gap-1.5">
               {["#ff5f57", "#febc2e", "#28c840"].map((c) => (
-                <span key={c} style={{ width: 8, height: 8, borderRadius: "50%", background: c, opacity: 0.7 }} />
+                <span
+                  key={c}
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    background: c,
+                    opacity: 0.7,
+                  }}
+                />
               ))}
             </div>
             <span
               className="text-xs"
-              style={{ color: "var(--c-text-muted)", fontFamily: "var(--font-mono)", letterSpacing: "0.1em" }}
+              style={{
+                color: "var(--c-text-muted)",
+                fontFamily: "var(--font-mono)",
+                letterSpacing: "0.1em",
+              }}
             >
               terminal — bokiev@glasscube
             </span>
@@ -170,17 +192,22 @@ export default function HomeSection({ lang }: HomeProps) {
           {/* Terminal body */}
           <div
             className="glass-panel flex-1 p-5 overflow-y-auto"
-            style={{ fontFamily: "var(--font-mono)", fontSize: "0.78rem" }}
+            style={{ fontFamily: "var(--font-mono)", fontSize: "0.8rem" }}
           >
             <div className="flex flex-col gap-3">
-
               {/* whoami */}
               <div className="stagger-1">
                 <div style={{ color: "var(--c-text-muted)" }}>
                   <span style={{ color: "var(--c-text-dim)" }}>{t.prompt}</span>{" "}
                   <span className="glow-text-dim">whoami</span>
                 </div>
-                <div style={{ color: "var(--c-text)", paddingLeft: "1rem", paddingTop: "0.2rem" }}>
+                <div
+                  style={{
+                    color: "var(--c-text)",
+                    paddingLeft: "1rem",
+                    paddingTop: "0.2rem",
+                  }}
+                >
                   nodirbek_bokiev
                 </div>
               </div>
@@ -203,8 +230,16 @@ export default function HomeSection({ lang }: HomeProps) {
                   }}
                 >
                   {`{
-  `}<span style={{ color: "var(--c-green)" }}>"role"</span>{`: `}<span style={{ color: "var(--c-ice)" }}>"Fullstack Dev @ SRZ Memor"</span>{`,
-  `}<span style={{ color: "var(--c-green)" }}>"stack"</span>{`: [`}
+  `}
+                  <span style={{ color: "var(--c-green)" }}>"role"</span>
+                  {`: `}
+                  <span style={{ color: "var(--c-ice)" }}>
+                    "Fullstack Dev @ SRZ Memor"
+                  </span>
+                  {`,
+  `}
+                  <span style={{ color: "var(--c-green)" }}>"stack"</span>
+                  {`: [`}
                   {STACK.map((s, i) => (
                     <span key={s}>
                       <span style={{ color: "var(--c-ice)" }}>"{s}"</span>
@@ -212,9 +247,23 @@ export default function HomeSection({ lang }: HomeProps) {
                     </span>
                   ))}
                   {`],
-  `}<span style={{ color: "var(--c-green)" }}>"edu"</span>{`: `}<span style={{ color: "var(--c-ice)" }}>"Dongseo Univ, CS"</span>{`,
-  `}<span style={{ color: "var(--c-green)" }}>"since"</span>{`: `}<span style={{ color: "var(--c-text)" }}>2018</span>{`,
-  `}<span style={{ color: "var(--c-green)" }}>"remote"</span>{`: `}<span style={{ color: "var(--c-green-bright)" }}>true</span>{`
+  `}
+                  <span style={{ color: "var(--c-green)" }}>"edu"</span>
+                  {`: `}
+                  <span style={{ color: "var(--c-ice)" }}>
+                    "Dongseo Univ, CS"
+                  </span>
+                  {`,
+  `}
+                  <span style={{ color: "var(--c-green)" }}>"since"</span>
+                  {`: `}
+                  <span style={{ color: "var(--c-text)" }}>2018</span>
+                  {`,
+  `}
+                  <span style={{ color: "var(--c-green)" }}>"remote"</span>
+                  {`: `}
+                  <span style={{ color: "var(--c-green-bright)" }}>true</span>
+                  {`
 }`}
                 </pre>
               </div>
@@ -228,7 +277,11 @@ export default function HomeSection({ lang }: HomeProps) {
                   <span className="glow-text-dim">echo $STATUS</span>
                 </div>
                 <div
-                  style={{ color: "var(--c-green)", paddingLeft: "1rem", paddingTop: "0.2rem" }}
+                  style={{
+                    color: "var(--c-green)",
+                    paddingLeft: "1rem",
+                    paddingTop: "0.2rem",
+                  }}
                   className="glow-text-dim"
                 >
                   {t.openFor}
@@ -247,10 +300,22 @@ export default function HomeSection({ lang }: HomeProps) {
 
           {/* Key hint */}
           <div
-            className="text-xs tracking-widest text-center stagger-6"
-            style={{ color: "var(--c-text-muted)", fontFamily: "var(--font-mono)" }}
+            className="hidden sm:block text-xs tracking-widest text-center stagger-6"
+            style={{
+              color: "var(--c-text-muted)",
+              fontFamily: "var(--font-mono)",
+            }}
           >
             ← → ARROW KEYS TO NAVIGATE
+          </div>
+          <div
+            className="sm:hidden text-xs tracking-widest text-center stagger-6"
+            style={{
+              color: "var(--c-text-muted)",
+              fontFamily: "var(--font-mono)",
+            }}
+          >
+            TAP BOTTOM NAV TO EXPLORE
           </div>
         </div>
       </div>

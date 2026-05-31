@@ -14,7 +14,7 @@ export default function ContactSection({ lang }: ContactProps) {
     <div className="relative w-full h-full overflow-y-auto" style={{ background: "var(--c-bg)" }}>
       <GridBg vignette />
 
-      <div className="relative z-10 max-w-xl mx-auto p-6 lg:p-8 flex flex-col gap-6 min-h-full justify-center">
+      <div className="relative z-10 max-w-xl mx-auto p-6 lg:p-8 pb-20 lg:pb-8 flex flex-col gap-6 min-h-full justify-center">
 
         {/* Terminal prompt */}
         <div

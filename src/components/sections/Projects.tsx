@@ -1,14 +1,19 @@
-import { PROJECTS, type Project } from "@/constants/projects";
+import { PROJECTS, PROJECT_CONTENT, type Project } from "@/constants/projects";
+import { STATUS_LABELS, type Lang } from "@/constants/translations";
 import GridBg from "@/components/ui/GridBg";
 
-const STATUS_CONFIG: Record<Project["status"], { label: string; color: string; glow: string }> = {
-  live:     { label: "LIVE",     color: "var(--c-green)",      glow: "var(--glow-sm)" },
-  wip:      { label: "WIP",      color: "var(--c-ice)",        glow: "0 0 6px rgba(212,240,255,0.4)" },
-  archived: { label: "ARCHIVED", color: "var(--c-text-muted)", glow: "none" },
+const STATUS_COLOR: Record<Project["status"], { color: string; glow: string }> = {
+  live:     { color: "var(--c-green)",      glow: "var(--glow-sm)" },
+  wip:      { color: "var(--c-ice)",        glow: "0 0 6px rgba(212,240,255,0.4)" },
+  archived: { color: "var(--c-text-muted)", glow: "none" },
 };
 
-function ProjectCard({ project, index }: { project: Project; index: number }) {
-  const status = STATUS_CONFIG[project.status];
+function ProjectCard({ project, index, lang }: { project: Project; index: number; lang: Lang }) {
+  const style = STATUS_COLOR[project.status];
+  const statusLabel = STATUS_LABELS[lang][project.status];
+  const i18n = PROJECT_CONTENT[lang][project.id];
+  const name = i18n?.name ?? project.name;
+  const description = i18n?.description ?? project.description;
 
   return (
     <div
@@ -27,7 +32,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
               letterSpacing: "0.04em",
             }}
           >
-            {project.name}
+            {name}
           </h3>
           <span
             style={{
@@ -44,8 +49,8 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           className="text-xs shrink-0"
           style={{
             fontFamily: "var(--font-mono)",
-            color: status.color,
-            textShadow: status.glow,
+            color: style.color,
+            textShadow: style.glow,
             letterSpacing: "0.1em",
             border: "1px solid currentColor",
             opacity: 0.7,
@@ -53,7 +58,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             fontSize: "0.6rem",
           }}
         >
-          {status.label}
+          {statusLabel}
         </span>
       </div>
 
@@ -67,7 +72,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           lineHeight: 1.7,
         }}
       >
-        {project.description}
+        {description}
       </p>
 
       {/* Stack tags */}
@@ -120,12 +125,12 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
   );
 }
 
-export default function ProjectsSection() {
+export default function ProjectsSection({ lang }: { lang: Lang }) {
   return (
     <div className="relative w-full h-full overflow-y-auto" style={{ background: "var(--c-bg)" }}>
       <GridBg vignette />
 
-      <div className="relative z-10 max-w-5xl mx-auto p-6 lg:p-8 flex flex-col gap-5">
+      <div className="relative z-10 max-w-5xl mx-auto p-6 lg:p-8 pb-20 lg:pb-8 flex flex-col gap-5">
 
         {/* Header */}
         <div
@@ -143,7 +148,7 @@ export default function ProjectsSection() {
         {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {PROJECTS.map((project, i) => (
-            <ProjectCard key={project.id} project={project} index={i} />
+            <ProjectCard key={project.id} project={project} index={i} lang={lang} />
           ))}
         </div>
       </div>

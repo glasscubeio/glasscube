@@ -1,71 +1,86 @@
 export type Lang = "en" | "ko" | "uz" | "ru";
 
-export const TABS = ["Home", "About", "Skills", "Projects", "Contact"] as const;
+export const TABS = ["Home", "Projects", "About", "Skills", "Contact"] as const;
 export type Tab = (typeof TABS)[number];
 
-export const HOME_CONTENT: Record<Lang, {
-  greeting: string;
-  name: string;
-  title: string;
-  location: string;
-  role: string;
-  available: string;
-  education: string;
-  since: string;
-  prompt: string;
-  resumeBtn: string;
-  openFor: string;
-}> = {
+export const STATUS_LABELS: Record<Lang, Record<"live" | "wip" | "archived", string>> = {
+  en: { live: "LIVE",       wip: "WIP",          archived: "ARCHIVED"     },
+  ko: { live: "LIVE",       wip: "개발중",         archived: "아카이브"      },
+  uz: { live: "JONLI",      wip: "ISHLANMOQDA",  archived: "ARXIV"        },
+  ru: { live: "LIVE",       wip: "В РАЗР.",       archived: "АРХИВ"        },
+};
+
+export const HOME_CONTENT: Record<
+  Lang,
+  {
+    greeting: string;
+    name: string;
+    title: string;
+    location: string;
+    role: string;
+    available: string;
+    education: string;
+    since: string;
+    prompt: string;
+    resumeBtn: string;
+    coverLetterBtn: string;
+    openFor: string;
+  }
+> = {
   en: {
     greeting: "Welcome to my portfolio",
     name: "BOKIEV NODIRBEK",
-    title: "Senior Backend Developer & System Architect",
+    title: "Fullstack Developer & System Architect",
     location: "Busan, South Korea",
-    role: "Fullstack Developer @ SRZ Memor",
+    role: "Fullstack Developer @ Tarmoqda",
     available: "Open to Remote / Worldwide",
     education: "Dongseo University — Computer Science",
-    since: "Engineering since 2018",
+    since: "Engineering since 2025",
     prompt: "boot@glasscube:~$",
     resumeBtn: "Download Resume",
+    coverLetterBtn: "Cover Letter",
     openFor: "Open for opportunities",
   },
   ko: {
     greeting: "포트폴리오에 오신 것을 환영합니다",
     name: "보키예프 노디르벡",
-    title: "시니어 백엔드 개발자 & 시스템 아키텍트",
+    title: "풀스택 개발자 & 시스템 아키텍트",
     location: "부산, 대한민국",
-    role: "풀스택 개발자 @ SRZ Memor",
+    role: "풀스택 개발자 @ Tarmoqda",
     available: "재택 / 전세계 가능",
     education: "동서대학교 — 컴퓨터공학",
-    since: "2018년부터 개발 중",
+    since: "2025년부터 개발 중",
     prompt: "boot@glasscube:~$",
     resumeBtn: "이력서 다운로드",
+    coverLetterBtn: "자기소개서",
     openFor: "기회 탐색 중",
   },
   uz: {
     greeting: "Portfoliomga xush kelibsiz",
     name: "BOKIEV NODIRBEK",
-    title: "Senior Backend Dasturchi & Sistema Arxitektori",
+    title: "Fullstack Dasturchi & Sistema Arxitektori",
     location: "Busan, Janubiy Koreya",
-    role: "Fullstack Dasturchi @ SRZ Memor",
+    role: "Fullstack Dasturchi @ Tarmoqda",
     available: "Masofaviy / Global",
     education: "Dongseo Universiteti — Kompyuter Fanlari",
-    since: "2018-yildan beri dasturlash",
+    since: "2025-yildan beri dasturlash",
     prompt: "boot@glasscube:~$",
     resumeBtn: "Rezyume yuklab olish",
+    coverLetterBtn: "Motivatsiya xat",
     openFor: "Imkoniyatlarga ochiq",
   },
   ru: {
     greeting: "Добро пожаловать в моё портфолио",
     name: "БОКИЕВ НОДИРБЕК",
-    title: "Старший Backend Разработчик & Системный Архитектор",
+    title: "Fullstack Разработчик & Системный Архитектор",
     location: "Пусан, Южная Корея",
-    role: "Fullstack Разработчик @ SRZ Memor",
+    role: "Fullstack Разработчик @ Tarmoqda",
     available: "Удалённая / Мировая занятость",
     education: "Университет Донгсо — Компьютерные науки",
-    since: "В разработке с 2018 года",
+    since: "В разработке с 2025 года",
     prompt: "boot@glasscube:~$",
     resumeBtn: "Скачать резюме",
+    coverLetterBtn: "Сопр. письмо",
     openFor: "Открыт к предложениям",
   },
 };
@@ -77,7 +92,7 @@ export const ABOUT_LINES: Record<Lang, string[]> = {
     "# Nodirbek Bokiev",
     "",
     "Backend engineer obsessed with system performance, control, and clean structure.",
-    "Started in 2018 with Kotlin — a broken calculator that couldn't divide was my first project.",
+    "Started in 2020 with Kotlin — a broken calculator that couldn't divide was my first project.",
     "Since then: minimalism, brutalist architecture, and hands-on experimentation.",
     "",
     "## Philosophy",
@@ -87,7 +102,7 @@ export const ABOUT_LINES: Record<Lang, string[]> = {
     "",
     "## Education & Career",
     "Dongseo University — Computer Science, Busan.",
-    "Currently: Fullstack Developer at SRZ Memor (Uzbek construction-tech).",
+    "Currently: Fullstack Developer at Tarmoqda (Uzbek construction-tech).",
     "",
     "## Learning Path",
     "Almost everything I know came from building. CodeWithMosh helped with foundations",
@@ -111,7 +126,7 @@ export const ABOUT_LINES: Record<Lang, string[]> = {
     "# 보키예프 노디르벡",
     "",
     "시스템 성능과 구조를 중시하는 백엔드 엔지니어.",
-    "2018년 Kotlin으로 시작 — 나누기 안 되는 계산기가 첫 프로젝트였습니다.",
+    "2020년 Kotlin으로 시작 — 나누기 안 되는 계산기가 첫 프로젝트였습니다.",
     "이후: 미니멀리즘, 구조주의, 실험적 개발.",
     "",
     "## 철학",
@@ -120,7 +135,7 @@ export const ABOUT_LINES: Record<Lang, string[]> = {
     "",
     "## 학력 & 경력",
     "동서대학교 — 컴퓨터공학, 부산.",
-    "현재: SRZ Memor에서 풀스택 개발자 (우즈베키스탄 건설 테크).",
+    "현재: Tarmoqda에서 풀스택 개발자 (우즈베키스탄 건설 테크).",
     "",
     "## 학습 방식",
     "실제 프로젝트를 통해 대부분의 기술을 습득했습니다.",
@@ -165,7 +180,7 @@ export const ABOUT_LINES: Record<Lang, string[]> = {
     "# Нодирбек Бокиев",
     "",
     "Backend-инженер, увлечённый производительностью и чистой архитектурой.",
-    "Начал в 2018 с Kotlin — первый проект: калькулятор без деления.",
+    "Начал в 2020 с Kotlin — первый проект: калькулятор без деления.",
     "С тех пор: минимализм, брутализм и практические эксперименты.",
     "",
     "## Философия",
@@ -174,7 +189,7 @@ export const ABOUT_LINES: Record<Lang, string[]> = {
     "",
     "## Образование & Карьера",
     "Университет Донгсо — Компьютерные науки, Пусан.",
-    "Сейчас: Fullstack разработчик в SRZ Memor.",
+    "Сейчас: Fullstack разработчик в Tarmoqda.",
     "",
     "## Путь обучения",
     "Большинство навыков — из реальных проектов.",
@@ -188,75 +203,127 @@ export const ABOUT_LINES: Record<Lang, string[]> = {
   ],
 };
 
-export const CONTACT_DATA: Record<Lang, {
-  heading: string;
-  subheading: string;
-  items: { label: string; value: string; href?: string }[];
-  social: { label: string; href: string }[];
-}> = {
+export const CONTACT_DATA: Record<
+  Lang,
+  {
+    heading: string;
+    subheading: string;
+    items: { label: string; value: string; href?: string }[];
+    social: { label: string; href: string }[];
+  }
+> = {
   en: {
     heading: "Get in Touch",
     subheading: "Available for remote work and collaborations worldwide.",
     items: [
-      { label: "Email", value: "worknadir95@gmail.com", href: "mailto:worknadir95@gmail.com" },
-      { label: "Phone", value: "+82 (10) 8173 7778", href: "tel:+821081737778" },
+      {
+        label: "Email",
+        value: "worknadir95@gmail.com",
+        href: "mailto:worknadir95@gmail.com",
+      },
+      {
+        label: "Phone",
+        value: "+82 (10) 8173 7778",
+        href: "tel:+821081737778",
+      },
       { label: "Location", value: "Sasang, Busan — Remote OK" },
       { label: "Response", value: "Within 24 hours" },
     ],
     social: [
       { label: "GitHub", href: "https://github.com/nodiry" },
-      { label: "LinkedIn", href: "#" },
-      { label: "Telegram", href: "#" },
+      {
+        label: "LinkedIn",
+        href: "https://www.linkedin.com/in/nodirbek-bokiev",
+      },
+      { label: "Telegram", href: "https://t.me/RBNNB" },
     ],
   },
   ko: {
     heading: "연락하기",
     subheading: "재택 근무 및 전 세계 협업 가능합니다.",
     items: [
-      { label: "이메일", value: "worknadir95@gmail.com", href: "mailto:worknadir95@gmail.com" },
-      { label: "전화번호", value: "+82 (10) 8173 7778", href: "tel:+821081737778" },
+      {
+        label: "이메일",
+        value: "worknadir95@gmail.com",
+        href: "mailto:worknadir95@gmail.com",
+      },
+      {
+        label: "전화번호",
+        value: "+82 (10) 8173 7778",
+        href: "tel:+821081737778",
+      },
       { label: "위치", value: "부산 사상구 — 재택 가능" },
       { label: "응답 시간", value: "보통 24시간 이내" },
     ],
     social: [
       { label: "GitHub", href: "https://github.com/nodiry" },
-      { label: "LinkedIn", href: "#" },
-      { label: "Telegram", href: "#" },
+      {
+        label: "LinkedIn",
+        href: "https://www.linkedin.com/in/nodirbek-bokiev",
+      },
+      { label: "Telegram", href: "https://t.me/RBNNB" },
     ],
   },
   uz: {
     heading: "Bog'lanish",
     subheading: "Masofaviy ish va global hamkorlik uchun mavjudman.",
     items: [
-      { label: "Email", value: "worknadir95@gmail.com", href: "mailto:worknadir95@gmail.com" },
-      { label: "Telefon", value: "+82 (10) 8173 7778", href: "tel:+821081737778" },
+      {
+        label: "Email",
+        value: "worknadir95@gmail.com",
+        href: "mailto:worknadir95@gmail.com",
+      },
+      {
+        label: "Telefon",
+        value: "+82 (10) 8173 7778",
+        href: "tel:+821081737778",
+      },
       { label: "Manzil", value: "Busan, Janubiy Koreya — Masofaviy OK" },
       { label: "Javob vaqti", value: "24 soat ichida" },
     ],
     social: [
       { label: "GitHub", href: "https://github.com/nodiry" },
-      { label: "LinkedIn", href: "#" },
-      { label: "Telegram", href: "#" },
+      {
+        label: "LinkedIn",
+        href: "https://www.linkedin.com/in/nodirbek-bokiev",
+      },
+      { label: "Telegram", href: "https://t.me/RBNNB" },
     ],
   },
   ru: {
     heading: "Связаться",
     subheading: "Доступен для удалённой работы и сотрудничества по всему миру.",
     items: [
-      { label: "Email", value: "worknadir95@gmail.com", href: "mailto:worknadir95@gmail.com" },
-      { label: "Телефон", value: "+82 (10) 8173 7778", href: "tel:+821081737778" },
+      {
+        label: "Email",
+        value: "worknadir95@gmail.com",
+        href: "mailto:worknadir95@gmail.com",
+      },
+      {
+        label: "Телефон",
+        value: "+82 (10) 8173 7778",
+        href: "tel:+821081737778",
+      },
       { label: "Адрес", value: "Пусан, Южная Корея — Удалённо ОК" },
       { label: "Время отклика", value: "В течение 24 часов" },
     ],
     social: [
       { label: "GitHub", href: "https://github.com/nodiry" },
-      { label: "LinkedIn", href: "#" },
-      { label: "Telegram", href: "#" },
+      {
+        label: "LinkedIn",
+        href: "https://www.linkedin.com/in/nodirbek-bokiev",
+      },
+      { label: "Telegram", href: "https://t.me/RBNNB" },
     ],
   },
 };
 
-export const LANG_OPTIONS: { key: string; label: string; native: string; lang: Lang }[] = [
+export const LANG_OPTIONS: {
+  key: string;
+  label: string;
+  native: string;
+  lang: Lang;
+}[] = [
   { key: "E", label: "English", native: "English", lang: "en" },
   { key: "K", label: "Korean", native: "한국어", lang: "ko" },
   { key: "R", label: "Russian", native: "Русский", lang: "ru" },

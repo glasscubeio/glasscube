@@ -9,11 +9,18 @@ export const SKILLS_DATA: Record<Lang, SkillCategory[]> = {
   en: [
     {
       title: "Backend Languages",
-      items: ["TypeScript", "Go", "Rust", "Java", "Kotlin"],
+      items: ["TypeScript", "Rust", "Java"],
     },
     {
       title: "Frameworks & Runtimes",
-      items: ["Bun.js", "Fastify", "Express", "Go Fiber", "Actix", "Spring Boot"],
+      items: [
+        "Bun.js",
+        "Fastify",
+        "Express",
+        "Go Fiber",
+        "Actix",
+        "Spring Boot",
+      ],
     },
     {
       title: "Frontend",
@@ -25,7 +32,7 @@ export const SKILLS_DATA: Record<Lang, SkillCategory[]> = {
     },
     {
       title: "Protocols & APIs",
-      items: ["gRPC", "WebSocket", "REST", "GraphQL"],
+      items: ["gRPC", "WebSocket", "REST"],
     },
     {
       title: "Dev Tools & Infra",
@@ -39,11 +46,18 @@ export const SKILLS_DATA: Record<Lang, SkillCategory[]> = {
   ko: [
     {
       title: "백엔드 언어",
-      items: ["TypeScript", "Go", "Rust", "Java", "Kotlin"],
+      items: ["TypeScript", "Rust", "Java"],
     },
     {
       title: "프레임워크 & 런타임",
-      items: ["Bun.js", "Fastify", "Express", "Go Fiber", "Actix", "Spring Boot"],
+      items: [
+        "Bun.js",
+        "Fastify",
+        "Express",
+        "Go Fiber",
+        "Actix",
+        "Spring Boot",
+      ],
     },
     {
       title: "프론트엔드",
@@ -55,7 +69,7 @@ export const SKILLS_DATA: Record<Lang, SkillCategory[]> = {
     },
     {
       title: "프로토콜 & API",
-      items: ["gRPC", "WebSocket", "REST", "GraphQL"],
+      items: ["gRPC", "WebSocket", "REST"],
     },
     {
       title: "개발 도구 & 인프라",
@@ -69,11 +83,18 @@ export const SKILLS_DATA: Record<Lang, SkillCategory[]> = {
   uz: [
     {
       title: "Backend tillari",
-      items: ["TypeScript", "Go", "Rust", "Java", "Kotlin"],
+      items: ["TypeScript", "Rust", "Java"],
     },
     {
       title: "Frameworklar & Muhitlar",
-      items: ["Bun.js", "Fastify", "Express", "Go Fiber", "Actix", "Spring Boot"],
+      items: [
+        "Bun.js",
+        "Fastify",
+        "Express",
+        "Go Fiber",
+        "Actix",
+        "Spring Boot",
+      ],
     },
     {
       title: "Frontend",
@@ -85,7 +106,7 @@ export const SKILLS_DATA: Record<Lang, SkillCategory[]> = {
     },
     {
       title: "Protokollar & API",
-      items: ["gRPC", "WebSocket", "REST", "GraphQL"],
+      items: ["gRPC", "WebSocket", "REST"],
     },
     {
       title: "Dasturiy vositalar",
@@ -99,11 +120,18 @@ export const SKILLS_DATA: Record<Lang, SkillCategory[]> = {
   ru: [
     {
       title: "Backend языки",
-      items: ["TypeScript", "Go", "Rust", "Java", "Kotlin"],
+      items: ["TypeScript", "Rust", "Java"],
     },
     {
       title: "Фреймворки & среды",
-      items: ["Bun.js", "Fastify", "Express", "Go Fiber", "Actix", "Spring Boot"],
+      items: [
+        "Bun.js",
+        "Fastify",
+        "Express",
+        "Go Fiber",
+        "Actix",
+        "Spring Boot",
+      ],
     },
     {
       title: "Frontend",
@@ -115,7 +143,7 @@ export const SKILLS_DATA: Record<Lang, SkillCategory[]> = {
     },
     {
       title: "Протоколы & API",
-      items: ["gRPC", "WebSocket", "REST", "GraphQL"],
+      items: ["gRPC", "WebSocket", "REST"],
     },
     {
       title: "Инструменты & инфра",

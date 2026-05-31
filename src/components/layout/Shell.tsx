@@ -3,6 +3,7 @@ import { useKeyNav } from "@/hooks/useKeyNav";
 import { useSound } from "@/hooks/useSound";
 import { TABS, type Tab, type Lang } from "@/constants/translations";
 import NavBar from "./NavBar";
+import MobileNav from "./MobileNav";
 import HomeSection from "@/components/sections/Home";
 import AboutSection from "@/components/sections/About";
 import SkillsSection from "@/components/sections/Skills";
@@ -39,7 +40,7 @@ export default function Shell({ lang }: ShellProps) {
       case "Home":     return <HomeSection lang={lang} />;
       case "About":    return <AboutSection lang={lang} />;
       case "Skills":   return <SkillsSection lang={lang} />;
-      case "Projects": return <ProjectsSection />;
+      case "Projects": return <ProjectsSection lang={lang} />;
       case "Contact":  return <ContactSection lang={lang} />;
     }
   };
@@ -54,6 +55,7 @@ export default function Shell({ lang }: ShellProps) {
       <main className="flex-1 overflow-hidden" key={activeTab}>
         {renderSection()}
       </main>
+      <MobileNav activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 }

@@ -55,7 +55,7 @@ export default function AboutSection({ lang }: AboutProps) {
         {/* Content */}
         <div
           ref={scrollRef}
-          className="glass-panel flex-1 p-5 overflow-y-auto"
+          className="glass-panel flex-1 p-5 pb-[72px] sm:pb-5 overflow-y-auto"
           style={{ fontFamily: "var(--font-mono)", fontSize: "0.78rem", lineHeight: "1.7" }}
         >
           {lines.slice(0, visible).map((line, i) => {

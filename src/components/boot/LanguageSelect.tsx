@@ -19,7 +19,9 @@ export default function LanguageSelect({ onSelect }: LanguageSelectProps) {
   };
 
   useKeyNav((e) => {
-    const opt = LANG_OPTIONS.find((o) => o.key.toLowerCase() === e.key.toLowerCase());
+    const opt = LANG_OPTIONS.find(
+      (o) => o.key.toLowerCase() === e.key.toLowerCase(),
+    );
     if (opt) select(opt.lang);
   }, []);
 
@@ -31,24 +33,38 @@ export default function LanguageSelect({ onSelect }: LanguageSelectProps) {
       <GridBg />
 
       {/* Corner decorators */}
-      <span className="corner-tl absolute top-6 left-6 w-5 h-5" aria-hidden="true" />
-      <span className="corner-tr absolute top-6 right-6 w-5 h-5" aria-hidden="true" />
-      <span className="corner-bl absolute bottom-6 left-6 w-5 h-5" aria-hidden="true" />
-      <span className="corner-br absolute bottom-6 right-6 w-5 h-5" aria-hidden="true" />
+      <span
+        className="corner-tl absolute top-6 left-6 w-5 h-5"
+        aria-hidden="true"
+      />
+      <span
+        className="corner-tr absolute top-6 right-6 w-5 h-5"
+        aria-hidden="true"
+      />
+      <span
+        className="corner-bl absolute bottom-6 left-6 w-5 h-5"
+        aria-hidden="true"
+      />
+      <span
+        className="corner-br absolute bottom-6 right-6 w-5 h-5"
+        aria-hidden="true"
+      />
 
       <div className="relative z-10 w-full max-w-md px-8 flex flex-col gap-8">
-
         {/* Header */}
         <div className="flex flex-col gap-1 stagger-1">
           <div
             className="text-xs tracking-[0.2em] uppercase"
-            style={{ color: "var(--c-text-muted)", fontFamily: "var(--font-mono)" }}
+            style={{
+              color: "var(--c-text-muted)",
+              fontFamily: "var(--font-mono)",
+            }}
           >
             boot@glasscube:~$
           </div>
           <div className="flex items-center gap-2">
             <span
-              className="glow-text text-sm tracking-[0.1em]"
+              className="glow-text text-sm tracking-widest"
               style={{ fontFamily: "var(--font-mono)" }}
             >
               SELECT LANGUAGE
@@ -73,7 +89,8 @@ export default function LanguageSelect({ onSelect }: LanguageSelectProps) {
                     className="text-base font-medium"
                     style={{
                       fontFamily: "var(--font-mono)",
-                      color: hover === lang ? "var(--c-green)" : "var(--c-text)",
+                      color:
+                        hover === lang ? "var(--c-green)" : "var(--c-text)",
                       textShadow: hover === lang ? "var(--glow-sm)" : "none",
                       transition: "all 0.15s",
                     }}
@@ -111,7 +128,10 @@ export default function LanguageSelect({ onSelect }: LanguageSelectProps) {
         {/* Hint */}
         <div
           className="text-xs tracking-widest text-center stagger-3"
-          style={{ color: "var(--c-text-muted)", fontFamily: "var(--font-mono)" }}
+          style={{
+            color: "var(--c-text-muted)",
+            fontFamily: "var(--font-mono)",
+          }}
         >
           PRESS KEY OR CLICK TO SELECT
         </div>

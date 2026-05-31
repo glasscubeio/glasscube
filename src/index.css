@@ -326,3 +326,39 @@ body {
 .corner-tr { border-top: 1px solid var(--c-border); border-right: 1px solid var(--c-border); }
 .corner-bl { border-bottom: 1px solid var(--c-border); border-left: 1px solid var(--c-border); }
 .corner-br { border-bottom: 1px solid var(--c-border); border-right: 1px solid var(--c-border); }
+
+/* ─── Mobile (below sm: 640px) ─── */
+@media (max-width: 639px) {
+  /* Use dynamic viewport height to avoid iOS Safari address bar clipping */
+  html, body, #root {
+    height: 100dvh;
+    min-height: 100dvh;
+  }
+
+  /* Touch-friendly buttons — Apple recommends 44px minimum */
+  .btn-glow {
+    min-height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    padding: 0.6rem 0.9rem;
+  }
+
+  /* Bigger lang select buttons */
+  .lang-btn {
+    min-height: 72px;
+    padding: 1.2rem 1.4rem;
+  }
+
+  /* Slightly larger skill badges for readability */
+  .skill-badge {
+    font-size: 0.72rem;
+    padding: 0.25rem 0.6rem;
+  }
+
+  /* Remove hover transform on cards (touch devices have no hover) */
+  .project-card:hover {
+    transform: none;
+  }
+}

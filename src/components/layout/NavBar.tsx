@@ -61,8 +61,8 @@ export default function NavBar({ activeTab, lang, onTabChange }: NavBarProps) {
         </span>
       </div>
 
-      {/* Tabs — center */}
-      <nav className="flex items-end h-full" aria-label="Main navigation">
+      {/* Tabs — center (desktop only) */}
+      <nav className="hidden sm:flex items-end h-full" aria-label="Main navigation">
         {TABS.map((tab) => (
           <button
             key={tab}

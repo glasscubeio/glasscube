@@ -45,7 +45,7 @@ export default function SkillsSection({ lang }: SkillsProps) {
     <div className="relative w-full h-full overflow-y-auto" style={{ background: "var(--c-bg)" }}>
       <GridBg vignette />
 
-      <div className="relative z-10 max-w-4xl mx-auto p-6 lg:p-8 flex flex-col gap-5">
+      <div className="relative z-10 max-w-4xl mx-auto p-6 lg:p-8 pb-20 lg:pb-8 flex flex-col gap-5">
 
         {/* Section header */}
         <div
