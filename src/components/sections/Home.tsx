@@ -119,7 +119,7 @@ export default function HomeSection({ lang }: HomeProps) {
           {/* Action buttons */}
           <div className="flex flex-wrap gap-2 stagger-4">
             <a
-              href="resume.pdf"
+              href="이력서.pdf"
               download
               className="btn-glow primary flex-1 text-center"
               style={{ textDecoration: "none" }}

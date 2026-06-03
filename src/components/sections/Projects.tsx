@@ -2,13 +2,22 @@ import { PROJECTS, PROJECT_CONTENT, type Project } from "@/constants/projects";
 import { STATUS_LABELS, type Lang } from "@/constants/translations";
 import GridBg from "@/components/ui/GridBg";
 
-const STATUS_COLOR: Record<Project["status"], { color: string; glow: string }> = {
-  live:     { color: "var(--c-green)",      glow: "var(--glow-sm)" },
-  wip:      { color: "var(--c-ice)",        glow: "0 0 6px rgba(212,240,255,0.4)" },
-  archived: { color: "var(--c-text-muted)", glow: "none" },
-};
+const STATUS_COLOR: Record<Project["status"], { color: string; glow: string }> =
+  {
+    live: { color: "var(--c-green)", glow: "var(--glow-sm)" },
+    wip: { color: "var(--c-ice)", glow: "0 0 6px rgba(212,240,255,0.4)" },
+    archived: { color: "var(--c-text-muted)", glow: "none" },
+  };
 
-function ProjectCard({ project, index, lang }: { project: Project; index: number; lang: Lang }) {
+function ProjectCard({
+  project,
+  index,
+  lang,
+}: {
+  project: Project;
+  index: number;
+  lang: Lang;
+}) {
   const style = STATUS_COLOR[project.status];
   const statusLabel = STATUS_LABELS[lang][project.status];
   const i18n = PROJECT_CONTENT[lang][project.id];
@@ -62,6 +71,14 @@ function ProjectCard({ project, index, lang }: { project: Project; index: number
         </span>
       </div>
 
+      {project.img && (
+        <img
+          src={project.img}
+          alt={name}
+          className="w-full h-48 object-cover"
+        />
+      )}
+
       {/* Description */}
       <p
         className="leading-relaxed flex-1"
@@ -76,9 +93,16 @@ function ProjectCard({ project, index, lang }: { project: Project; index: number
       </p>
 
       {/* Stack tags */}
-      <div className="flex flex-wrap gap-1 pt-1" style={{ borderTop: "1px solid var(--c-border-dim)" }}>
+      <div
+        className="flex flex-wrap gap-1 pt-1"
+        style={{ borderTop: "1px solid var(--c-border-dim)" }}
+      >
         {project.stack.slice(0, 6).map((tech) => (
-          <span key={tech} className="skill-badge" style={{ fontSize: "0.6rem" }}>
+          <span
+            key={tech}
+            className="skill-badge"
+            style={{ fontSize: "0.6rem" }}
+          >
             {tech}
           </span>
         ))}
@@ -104,7 +128,12 @@ function ProjectCard({ project, index, lang }: { project: Project; index: number
             target="_blank"
             rel="noreferrer"
             className="btn-glow text-center"
-            style={{ flex: 1, textDecoration: "none", display: "block", fontSize: "0.65rem" }}
+            style={{
+              flex: 1,
+              textDecoration: "none",
+              display: "block",
+              fontSize: "0.65rem",
+            }}
           >
             GitHub ↗
           </a>
@@ -114,7 +143,12 @@ function ProjectCard({ project, index, lang }: { project: Project; index: number
               target="_blank"
               rel="noreferrer"
               className="btn-glow primary text-center"
-              style={{ flex: 1, textDecoration: "none", display: "block", fontSize: "0.65rem" }}
+              style={{
+                flex: 1,
+                textDecoration: "none",
+                display: "block",
+                fontSize: "0.65rem",
+              }}
             >
               Demo ↗
             </a>
@@ -127,17 +161,22 @@ function ProjectCard({ project, index, lang }: { project: Project; index: number
 
 export default function ProjectsSection({ lang }: { lang: Lang }) {
   return (
-    <div className="relative w-full h-full overflow-y-auto" style={{ background: "var(--c-bg)" }}>
+    <div
+      className="relative w-full h-full overflow-y-auto"
+      style={{ background: "var(--c-bg)" }}
+    >
       <GridBg vignette />
 
       <div className="relative z-10 max-w-5xl mx-auto p-6 lg:p-8 pb-20 lg:pb-8 flex flex-col gap-5">
-
         {/* Header */}
         <div
           className="flex items-center gap-3 stagger-1"
           style={{ fontFamily: "var(--font-mono)" }}
         >
-          <span className="text-xs tracking-[0.2em] uppercase" style={{ color: "var(--c-text-muted)" }}>
+          <span
+            className="text-xs tracking-[0.2em] uppercase"
+            style={{ color: "var(--c-text-muted)" }}
+          >
             boot@glasscube:~$
           </span>
           <span className="glow-text-dim text-xs tracking-widest">
@@ -148,7 +187,12 @@ export default function ProjectsSection({ lang }: { lang: Lang }) {
         {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {PROJECTS.map((project, i) => (
-            <ProjectCard key={project.id} project={project} index={i} lang={lang} />
+            <ProjectCard
+              key={project.id}
+              project={project}
+              index={i}
+              lang={lang}
+            />
           ))}
         </div>
       </div>

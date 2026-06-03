@@ -5,6 +5,7 @@ export interface Project {
   name: string;
   description: string;
   stack: string[];
+  img?: string;
   status: "live" | "wip" | "archived";
   github?: string;
   demo?: string;
@@ -15,140 +16,173 @@ export const PROJECT_CONTENT: Record<
   Lang,
   Record<string, { name: string; description: string }>
 > = {
-  en: {},
+  en: {
+    analytics: {
+      name: "Analytics",
+      description: "Web/mobile traffic analytics service from my junior year.",
+    },
+    hellostranger: {
+      name: "Hello Stranger",
+      description: "Anonymous WebRTC video chat with no signup required.",
+    },
+    chat: {
+      name: "Private Chat",
+      description: "Instant 1:1 text chat rooms using WebSockets.",
+    },
+    "smart-scheduler": {
+      name: "AI Study Scheduler",
+      description: "Smart task manager using dynamic priority queues.",
+    },
+    "qr-demo": {
+      name: "QR Generator",
+      description: "Quick custom QR code generation tool for links and text.",
+    },
+    "glasscube-portfolio": {
+      name: "GlassCube Portfolio",
+      description: "Terminal-styled multi-language personal portfolio.",
+    },
+    playwright: {
+      name: "Playwright Demo",
+      description: "Simple demo displaying web automation and testing.",
+    },
+    botanik: {
+      name: "Botanik CLI",
+      description: "CLI tool for automated test and documentation generation.",
+    },
+    financemate: {
+      name: "FinanceMate",
+      description:
+        "Personal dashboard for budget goals and transaction tracking.",
+    },
+    music: {
+      name: "Music Player",
+      description: "Audio streaming player for personal music collections.",
+    },
+  },
   ko: {
     analytics: {
       name: "애널리틱스",
-      description:
-        "주니어 시절에 만든 웹사이트 및 모바일 앱 트래픽 분석 서비스.",
+      description: "주니어 시절 제작한 웹·앱 트래픽 분석 서비스.",
     },
     hellostranger: {
-      name: "헬로 스트레인저 채팅",
-      description:
-        "WebRTC 기반 랜덤 영상 채팅. 계정 없이 낯선 사람과 즉시 연결. 프라이버시 우선 설계.",
+      name: "헬로 스트레인저",
+      description: "가입 없는 WebRTC 기반 익명 영상 채팅.",
     },
     chat: {
       name: "프라이빗 채팅",
-      description:
-        "Socket 기반 1:1 텍스트 채팅. 계정 없이 바로 연결 가능. 프라이버시 우선 설계.",
+      description: "소켓 기반의 익명 1:1 텍스트 채팅.",
     },
     "smart-scheduler": {
-      name: "스마트 학습 스케줄러",
-      description:
-        "우선순위 큐, 동적 일정 조정, 자기 개선 기능을 갖춘 AI 기반 학습 스케줄러.",
+      name: "AI 스케줄러",
+      description: "우선순위 큐 기반의 AI 학습 계획표.",
+    },
+    "qr-demo": {
+      name: "QR 생성기",
+      description: "링크 및 텍스트 맞춤형 QR 코드 생성 도구.",
     },
     "glasscube-portfolio": {
-      name: "글래스큐브 포트폴리오",
-      description:
-        "이 포트폴리오. 터미널 감성 UI, 다국어 지원, 부팅 시퀀스, Tron 영감 디자인.",
+      name: "글래스큐브",
+      description: "터미널 감성과 다국어를 지원하는 포트폴리오.",
     },
     playwright: {
       name: "플레이라이트 데모",
-      description: "Playwright의 주요 기능을 시연하는 간단한 웹 앱.",
+      description: "웹 브라우저 자동화 및 테스트 기능 시연.",
     },
     botanik: {
-      name: "보타닉",
-      description:
-        "코드베이스를 분석해 테스트를 자동 생성·실행하고 문서도 제공하는 CLI 도구. 백/프론트 개발 모두에 유용.",
+      name: "보타닉 CLI",
+      description: "코드 분석을 통한 자동 테스트 및 문서 생성 도구.",
     },
     financemate: {
       name: "파이낸스메이트",
-      description:
-        "거래 분류, 지출 분석, 예산 목표 추적 기능의 개인 재무 대시보드.",
+      description: "자산 관리 및 거래 분석용 개인 재무 대시보드.",
     },
     music: {
-      name: "Music player",
-      description: "Playlist of my own music.",
+      name: "뮤직 플레이어",
+      description: "개인 음원 재생을 위한 오디오 플레이어.",
     },
   },
   uz: {
     analytics: {
       name: "Analytics",
-      description:
-        "Junior yilida yaratilgan veb va mobil ilova trafigini tahlil qilish xizmati.",
+      description: "Junior yilida yaratilgan veb va mobil trafik tahlili.",
     },
     hellostranger: {
-      name: "Begona bilan Chat",
-      description:
-        "WebRTC asosida tasodifiy video chat. Hisob kerak emas, darhol bog'laning.",
+      name: "Hello Stranger",
+      description: "Ro'yxatdan o'tmasdan WebRTC tasodifiy video chat.",
     },
     chat: {
       name: "Maxfiy Chat",
-      description:
-        "Socket asosida shaxsiy matnli chat. Hisob kerak emas, darhol ulanish.",
+      description: "Soketga asoslangan shaxsiy 1:1 matnli chat.",
     },
     "smart-scheduler": {
-      name: "Aqlli O'quv Rejalashtiruvchi",
-      description:
-        "Ustuvorlik navbatlari va dinamik o'zgarishlar bilan AI yordamchi o'quv rejalashtiruvchi.",
+      name: "AI Rejalashtiruvchi",
+      description: "Dinamik ustuvorlikka ega aqlli o'quv rejalashtiruvchi.",
+    },
+    "qr-demo": {
+      name: "QR Generator",
+      description: "Link va matnlar uchun QR kod yaratish vositasi.",
     },
     "glasscube-portfolio": {
-      name: "GlassCube Portfolio",
-      description:
-        "Ushbu portfolio. Terminal estetikasi, ko'p tilli qo'llab-quvvatlash va Tron dizayni.",
+      name: "GlassCube",
+      description: "Terminal uslubidagi ko'p tilli portfolio.",
     },
     playwright: {
       name: "Playwright Demo",
-      description: "Playwright imkoniyatlarini ko'rsatadigan oddiy demo ilova.",
+      description: "Brauzer avtomatizatsiyasini ko'rsatuvchi demo ilova.",
     },
     botanik: {
-      name: "Botanik",
-      description:
-        "Kodni o'qib, testlarni avtomatik yaratib ishlatadigan va hujjatlar taqdim etadigan CLI vosita.",
+      name: "Botanik CLI",
+      description: "Avtomatik test va hujjat yaratuvchi CLI vositasi.",
     },
     financemate: {
       name: "Moliya Yordamchi",
-      description:
-        "Tranzaksiyalar tasnifi, xarajat tahlili va byudjet kuzatuvi bilan shaxsiy moliya paneli.",
+      description: "Xarajatlar tahlili va shaxsiy moliya paneli.",
     },
     music: {
-      name: "Music player",
-      description: "playlist of my own music",
+      name: "Musiqa Pleyer",
+      description: "Shaxsiy musiqalarni tinglash uchun pleyer.",
     },
   },
   ru: {
     analytics: {
       name: "Аналитика",
-      description:
-        "Сервис аналитики трафика для сайтов и мобильных приложений, создан в студенческие годы.",
+      description: "Сервис аналитики трафика, созданный в студенческие годы.",
     },
     hellostranger: {
-      name: "Чат с Незнакомцем",
-      description:
-        "Случайный видеочат на WebRTC. Без регистрации — мгновенное соединение с незнакомцем.",
+      name: "Hello Stranger",
+      description: "Анонимный видеочат на WebRTC без регистрации.",
     },
     chat: {
       name: "Приватный Чат",
-      description:
-        "Приватный чат на Socket.io. Без регистрации — мгновенное соединение один на один.",
+      description: "Мгновенный текстовый чат один на один на сокетах.",
     },
     "smart-scheduler": {
-      name: "Умный Планировщик",
-      description:
-        "AI-планировщик учёбы с очередями приоритетов, динамическим расписанием и самосовершенствованием.",
+      name: "AI Планировщик",
+      description: "Умное расписание учебы с очередью приоритетов.",
+    },
+    "qr-demo": {
+      name: "QR Генератор",
+      description: "Утилита для генерации кастомных QR-кодов.",
     },
     "glasscube-portfolio": {
-      name: "GlassCube Портфолио",
-      description:
-        "Это портфолио. Терминальная эстетика, мультиязычность, загрузочная анимация, стиль Tron.",
+      name: "GlassCube",
+      description: "Мультиязычное портфолио в стиле терминала.",
     },
     playwright: {
       name: "Playwright Демо",
-      description: "Демо-приложение для тестирования возможностей Playwright.",
+      description: "Демонстрация автоматизации и тестирования сайтов.",
     },
     botanik: {
-      name: "Botanik",
-      description:
-        "CLI-инструмент: читает код, автоматически создаёт и запускает тесты, генерирует документацию.",
+      name: "Botanik CLI",
+      description: "CLI-инструмент для автогенерации тестов и документации.",
     },
     financemate: {
       name: "ФинансПомощник",
-      description:
-        "Дашборд личных финансов: категоризация транзакций, аналитика расходов, отслеживание бюджета.",
+      description: "Личный финансовый дашборд для учета расходов.",
     },
     music: {
       name: "Музыкальный плеер",
-      description: "Плеер для воспроизведения музыки.",
+      description: "Плеер для прослушивания личных треков.",
     },
   },
 };
@@ -158,20 +192,22 @@ export const PROJECTS: Project[] = [
     id: "analytics",
     name: "Analytics",
     description:
-      "a service for analyzing website or mobile application traffic, old one i made during junior year ",
+      "Web and mobile app traffic analytics service built during my junior year.",
     stack: ["TypeScript", "Bun.js", "Express", "Mongodb", "Memcached", "React"],
     status: "live",
+    img: "/screenshots/analytics.png",
     demo: "https://analytics.glasscube.uz",
     github: "https://github.com/nodiry/web-analytics",
     year: 2024,
   },
   {
     id: "hellostranger",
-    name: "Hello Stranger Chat",
+    name: "Hello Stranger",
     description:
-      "Random video chat — connect with strangers instantly. WebRTC-based, no accounts required. Privacy-first design.",
+      "Account-free random video chat built on WebRTC with privacy-first design.",
     stack: ["TypeScript", "WebRTC", "WebSocket", "React", "Vite", "Node.js"],
     status: "live",
+    img: "/screenshots/video.png",
     demo: "https://stranger.glasscube.uz",
     github: "https://github.com/nodiry/random-video-chat-demo",
     year: 2025,
@@ -179,65 +215,80 @@ export const PROJECTS: Project[] = [
   {
     id: "chat",
     name: "Private Chat",
-    description:
-      "Private text chat — connect with a person instantly. Socket-based, no accounts required. Privacy-first design.",
+    description: "Instant 1:1 anonymous text chat powered by Socket.io.",
     stack: ["TypeScript", "Socket.io", "React", "Vite", "Node.js"],
     status: "live",
+    img: "/screenshots/chat.png",
     demo: "https://chat.glasscube.uz",
     github: "https://github.com/nodiry/chat-demo",
     year: 2026,
   },
   {
     id: "smart-scheduler",
-    name: "Smart Study Scheduler",
+    name: "AI Study Scheduler",
     description:
-      "AI-assisted task scheduling system with priority queues, Dynamic changes, and self improvement.",
+      "AI-assisted task scheduling with dynamic adjustment and priority queues.",
     stack: ["TypeScript", "Elysia", "MongoDB", "React", "Memcached"],
     status: "live",
+    img: "/screenshots/study.png",
     demo: "https://study.glasscube.uz",
     github: "https://github.com/nodiry/smart-study-scheduler",
     year: 2024,
   },
   {
+    id: "qr-demo",
+    name: "QR Generator",
+    description: "Customizable QR code generator for any URL or text input.",
+    stack: ["TypeScript", "React", "Vite", "Tailwind CSS"],
+    status: "live",
+    img: "/screenshots/qr.png",
+    demo: "https://qr.glasscube.uz",
+    github: "https://github.com/nodiry/qr-demo",
+    year: 2024,
+  },
+  {
     id: "glasscube-portfolio",
-    name: "GlassCube Portfolio",
+    name: "GlassCube",
     description:
-      "This portfolio. Terminal-aesthetic developer portfolio with multi-language support, boot sequence, and Tron-inspired design.",
+      "Terminal-aesthetic portfolio with multi-language support and Tron design.",
     stack: ["React", "ShadcnUI", "Vite", "Tailwind CSS"],
     status: "live",
+    img: "/screenshots/portfolio.png",
     demo: "https://glasscube.uz",
     github: "https://github.com/glasscubeio/glasscube",
     year: 2026,
   },
   {
     id: "playwright",
-    name: "Playwright demo",
+    name: "Playwright Demo",
     description:
-      "Playwright demo — a simple web app that demonstrates Playwright's capabilities.",
+      "A straightforward web application showcasing Playwright's automation capabilities.",
     stack: ["React", "Playwright", "Express", "Vite", "Tailwind CSS"],
     status: "live",
+    img: "/screenshots/playwright.png",
     demo: "https://playwright.glasscube.uz",
     github: "https://github.com/nodiry/browser-screenshotter",
     year: 2026,
   },
   {
     id: "music",
-    name: "Music player",
-    description: "Playlist of my own music.",
+    name: "Music Player",
+    description:
+      "A custom personal audio player to stream my own music playlist.",
     stack: ["React", "Playwright", "Express", "Vite", "Tailwind CSS"],
     status: "live",
+    img: "/screenshots/music.png",
     demo: "https://music.glasscube.uz",
     github: "https://github.com/nodiry/music",
     year: 2026,
   },
   {
     id: "botanik",
-    name: "Botanik",
+    name: "Botanik CLI",
     description:
-      "CLI Tool that reads the codebase and creates tests and runs the tests automatically and also provides docs. very useful for backend/frontend development.",
+      "CLI tool that parses codebases to auto-generate tests and documentation.",
     stack: ["Bash", "TypeScript", "Bun.js", "LLM", "Claude"],
     status: "wip",
-    demo: "https://botanik.glasscube.uz",
     github: "#",
     year: 2026,
   },
@@ -245,10 +296,9 @@ export const PROJECTS: Project[] = [
     id: "financemate",
     name: "FinanceMate",
     description:
-      "Personal finance tracking dashboard with transaction categorization, spending analytics, and budget goal tracking.",
+      "Personal finance dashboard featuring transaction tracking and spending analytics.",
     stack: ["TypeScript", "React", "Vite", "PostgreSQL", "Node.js", "Tailwind"],
     status: "archived",
-    demo: "https://financemate.glasscube.uz",
     github: "https://github.com/nodiry/financemate",
     year: 2024,
   },
