@@ -3,11 +3,14 @@ export type Lang = "en" | "ko" | "uz" | "ru";
 export const TABS = ["Home", "Projects", "About", "Skills", "Contact"] as const;
 export type Tab = (typeof TABS)[number];
 
-export const STATUS_LABELS: Record<Lang, Record<"live" | "wip" | "archived", string>> = {
-  en: { live: "LIVE",       wip: "WIP",          archived: "ARCHIVED"     },
-  ko: { live: "LIVE",       wip: "개발중",         archived: "아카이브"      },
-  uz: { live: "JONLI",      wip: "ISHLANMOQDA",  archived: "ARXIV"        },
-  ru: { live: "LIVE",       wip: "В РАЗР.",       archived: "АРХИВ"        },
+export const STATUS_LABELS: Record<
+  Lang,
+  Record<"live" | "wip" | "archived", string>
+> = {
+  en: { live: "LIVE", wip: "WIP", archived: "ARCHIVED" },
+  ko: { live: "LIVE", wip: "개발중", archived: "아카이브" },
+  uz: { live: "JONLI", wip: "ISHLANMOQDA", archived: "ARXIV" },
+  ru: { live: "LIVE", wip: "В РАЗР.", archived: "АРХИВ" },
 };
 
 export const HOME_CONTENT: Record<
@@ -102,7 +105,7 @@ export const ABOUT_LINES: Record<Lang, string[]> = {
     "",
     "## Education & Career",
     "Dongseo University — Computer Science, Busan.",
-    "Currently: Fullstack Developer at Tarmoqda (Uzbek construction-tech).",
+    "Currently: Fullstack Developer at Tarmoqda (Uzbek SaaS-tech).",
     "",
     "## Learning Path",
     "Almost everything I know came from building. CodeWithMosh helped with foundations",
@@ -135,7 +138,7 @@ export const ABOUT_LINES: Record<Lang, string[]> = {
     "",
     "## 학력 & 경력",
     "동서대학교 — 컴퓨터공학, 부산.",
-    "현재: Tarmoqda에서 풀스택 개발자 (우즈베키스탄 건설 테크).",
+    "현재: Tarmoqda에서 풀스택 개발자 (우즈베키스탄 SaaS 테크).",
     "",
     "## 학습 방식",
     "실제 프로젝트를 통해 대부분의 기술을 습득했습니다.",

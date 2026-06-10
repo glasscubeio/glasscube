@@ -44,7 +44,7 @@ export default function HomeSection({ lang }: HomeProps) {
                 }}
               />
               <img
-                src="/me.png"
+                src="/me.avif"
                 alt="Bokiev Nodirbek"
                 style={{
                   width: 120,

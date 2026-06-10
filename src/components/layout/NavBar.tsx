@@ -37,7 +37,7 @@ export default function NavBar({ activeTab, lang, onTabChange }: NavBarProps) {
       {/* Logo + brand */}
       <div className="flex items-center gap-2.5 shrink-0">
         <img
-          src="/logo.png"
+          src="/favicon.png"
           alt="GlassCube"
           style={{ width: 22, height: 22, objectFit: "contain", opacity: 0.9 }}
         />
@@ -55,14 +55,21 @@ export default function NavBar({ activeTab, lang, onTabChange }: NavBarProps) {
         </span>
         <span
           className="text-xs lowercase"
-          style={{ color: "var(--c-text-muted)", fontFamily: "var(--font-mono)", letterSpacing: "0.05em" }}
+          style={{
+            color: "var(--c-text-muted)",
+            fontFamily: "var(--font-mono)",
+            letterSpacing: "0.05em",
+          }}
         >
           {activeTab.toLowerCase()}
         </span>
       </div>
 
       {/* Tabs — center (desktop only) */}
-      <nav className="hidden sm:flex items-end h-full" aria-label="Main navigation">
+      <nav
+        className="hidden sm:flex items-end h-full"
+        aria-label="Main navigation"
+      >
         {TABS.map((tab) => (
           <button
             key={tab}
@@ -91,7 +98,10 @@ export default function NavBar({ activeTab, lang, onTabChange }: NavBarProps) {
           />
           <span
             className="text-xs tracking-widest"
-            style={{ color: "var(--c-text-dim)", fontFamily: "var(--font-mono)" }}
+            style={{
+              color: "var(--c-text-dim)",
+              fontFamily: "var(--font-mono)",
+            }}
           >
             ONLINE
           </span>

@@ -135,7 +135,7 @@ function ProjectCard({
               fontSize: "0.65rem",
             }}
           >
-            GitHub ↗
+            Source Code
           </a>
           {project.demo && project.demo !== "#" && (
             <a
@@ -150,7 +150,7 @@ function ProjectCard({
                 fontSize: "0.65rem",
               }}
             >
-              Demo ↗
+              Try
             </a>
           )}
         </div>
