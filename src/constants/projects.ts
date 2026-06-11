@@ -33,6 +33,11 @@ export const PROJECT_CONTENT: Record<
       name: "AI Study Scheduler",
       description: "Smart task manager using dynamic priority queues.",
     },
+    antiyoy: {
+      name: "Antiyoy Game",
+      description:
+        "A 2D strategy turn based game where players compete against AI opponents.",
+    },
     "qr-demo": {
       name: "QR Generator",
       description: "Quick custom QR code generation tool for links and text.",
@@ -76,6 +81,10 @@ export const PROJECT_CONTENT: Record<
       name: "AI 스케줄러",
       description: "우선순위 큐 기반의 AI 학습 계획표.",
     },
+    antiyoy: {
+      name: "안티요이 게임",
+      description: "인공지능(AI)과 경쟁하는 2D 턴제 전략 게임.",
+    },
     "qr-demo": {
       name: "QR 생성기",
       description: "링크 및 텍스트 맞춤형 QR 코드 생성 도구.",
@@ -118,6 +127,11 @@ export const PROJECT_CONTENT: Record<
       name: "AI Rejalashtiruvchi",
       description: "Dinamik ustuvorlikka ega aqlli o'quv rejalashtiruvchi.",
     },
+    antiyoy: {
+      name: "Antiyoy O'yini",
+      description:
+        "O'yinchilar sun'iy intellektga (AI) qarshi bellashadigan 2D navbatli strategiya o'yini.",
+    },
     "qr-demo": {
       name: "QR Generator",
       description: "Link va matnlar uchun QR kod yaratish vositasi.",
@@ -159,6 +173,11 @@ export const PROJECT_CONTENT: Record<
     "smart-scheduler": {
       name: "AI Планировщик",
       description: "Умное расписание учебы с очередью приоритетов.",
+    },
+    antiyoy: {
+      name: "Игра Antiyoy",
+      description:
+        "Пошаговая 2D-стратегия, в которой игроки соревнуются с ИИ-противниками.",
     },
     "qr-demo": {
       name: "QR Генератор",
@@ -234,6 +253,18 @@ export const PROJECTS: Project[] = [
     demo: "https://study.glasscube.uz",
     github: "https://github.com/nodiry/smart-study-scheduler",
     year: 2024,
+  },
+  {
+    id: "antiyoy",
+    name: "Antiyoy Game",
+    description:
+      "A 2D strategy turn based game where players compete against AI opponents.",
+    stack: ["TypeScript", "React", "Bun", "Tailwind CSS", "ShadcnUI"],
+    status: "live",
+    img: "/screenshots/antiyoy.png",
+    demo: "https://antiyoy.glasscube.uz",
+    github: "https://github.com/nodiry/web-antiyoy",
+    year: 2026,
   },
   {
     id: "qr-demo",
