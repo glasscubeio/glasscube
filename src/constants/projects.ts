@@ -63,6 +63,16 @@ export const PROJECT_CONTENT: Record<
       name: "Music Player",
       description: "Audio streaming player for personal music collections.",
     },
+    algorithms: {
+      name: "Algorithms",
+      description:
+        "Collection of algorithms and data structures with interactive visualizations.",
+    },
+    maze: {
+      name: "FPS Maze Game",
+      description:
+        "First-person maze game featuring procedurally generated levels.",
+    },
   },
   ko: {
     analytics: {
@@ -108,6 +118,15 @@ export const PROJECT_CONTENT: Record<
     music: {
       name: "뮤직 플레이어",
       description: "개인 음원 재생을 위한 오디오 플레이어.",
+    },
+    algorithms: {
+      name: "알고리즘",
+      description:
+        "알고리즘과 자료구조를 시각적으로 학습할 수 있는 인터랙티브 컬렉션.",
+    },
+    maze: {
+      name: "FPS 미로 게임",
+      description: "절차적으로 생성된 미로를 탐험하는 1인칭 미로 게임.",
     },
   },
   uz: {
@@ -156,6 +175,16 @@ export const PROJECT_CONTENT: Record<
       name: "Musiqa Pleyer",
       description: "Shaxsiy musiqalarni tinglash uchun pleyer.",
     },
+    algorithms: {
+      name: "Algoritmlar",
+      description:
+        "Algoritmlar va ma'lumotlar tuzilmalarining interaktiv vizualizatsiyalari to'plami.",
+    },
+    maze: {
+      name: "FPS Labirint O'yini",
+      description:
+        "Protsedurali yaratilgan labirintlarda harakatlanishga asoslangan FPS o'yini.",
+    },
   },
   ru: {
     analytics: {
@@ -202,6 +231,16 @@ export const PROJECT_CONTENT: Record<
     music: {
       name: "Музыкальный плеер",
       description: "Плеер для прослушивания личных треков.",
+    },
+    algorithms: {
+      name: "Алгоритмы",
+      description:
+        "Коллекция алгоритмов и структур данных с интерактивной визуализацией.",
+    },
+    maze: {
+      name: "FPS Лабиринт",
+      description:
+        "Игра от первого лица с исследованием процедурно генерируемого лабиринта.",
     },
   },
 };
@@ -290,6 +329,18 @@ export const PROJECTS: Project[] = [
     year: 2026,
   },
   {
+    id: "algorithms",
+    name: "Algorithms",
+    description:
+      "A collection of algorithms and data structures visualized implemented in TypeScript.",
+    stack: ["React", "ShadcnUI", "Vite", "Tailwind CSS"],
+    status: "live",
+    img: "/screenshots/algorithm.png",
+    demo: "https://algorithm.glasscube.uz",
+    github: "https://github.com/glasscubeio/algorithms",
+    year: 2025,
+  },
+  {
     id: "playwright",
     name: "Playwright Demo",
     description:
@@ -322,6 +373,16 @@ export const PROJECTS: Project[] = [
     status: "wip",
     github: "#",
     year: 2026,
+  },
+  {
+    id: "maze",
+    name: "FPS Maze Game",
+    description:
+      "FPS maze game where player navigates through a procedurally generated maze.",
+    stack: ["OpenGL", "Python3"],
+    status: "archived",
+    github: "https://github.com/nodiry/maze_game",
+    year: 2024,
   },
   {
     id: "financemate",
