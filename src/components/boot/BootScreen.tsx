@@ -75,7 +75,7 @@ export default function BootScreen({ onBoot }: BootScreenProps) {
         {/* Logo */}
         <div className="flex flex-col items-center gap-4 fade-in">
           <img
-            src="/logo.png"
+            src="/favicon.png"
             alt="GlassCube"
             className="boot-logo flicker-anim"
             style={{ width: 96, height: 96, objectFit: "contain" }}
