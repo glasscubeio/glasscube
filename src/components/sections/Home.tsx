@@ -1,10 +1,34 @@
 import { HOME_CONTENT, type Lang } from "@/constants/translations";
 import GridBg from "@/components/ui/GridBg";
 import CursorBlink from "@/components/ui/CursorBlink";
+import { CopyAddress } from "../ui/copyAddress";
 
 interface HomeProps {
   lang: Lang;
 }
+
+const POLAR_CHECKOUT_URL = "#";
+
+const CRYPTO = [
+  {
+    label: "ETH",
+    network: "All networks",
+    address: "0xfa1bcfda013cba9594f0d62306cccdc03bc8b48d",
+    icon: "base",
+  },
+  {
+    label: "USDC",
+    network: "Base",
+    address: "0xfa1bcfda013cba9594f0d62306cccdc03bc8b48d",
+    icon: "usdc",
+  },
+  {
+    label: "USDC",
+    network: "Ethereum",
+    address: "0xfa1bcfda013cba9594f0d62306cccdc03bc8b48d",
+    icon: "usdc",
+  },
+];
 
 const STACK = ["TypeScript", "Go", "Rust", "Bun.js", "PostgreSQL", "React"];
 const SOCIAL = [
@@ -44,7 +68,7 @@ export default function HomeSection({ lang }: HomeProps) {
                 }}
               />
               <img
-                src="/me.avif"
+                src="/me.jpeg"
                 alt="Bokiev Nodirbek"
                 style={{
                   width: 120,
@@ -136,20 +160,107 @@ export default function HomeSection({ lang }: HomeProps) {
             </a>
           </div>
 
-          {/* Social links */}
-          <div className="flex gap-2 stagger-5">
-            {SOCIAL.map(({ label, href }) => (
-              <a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noreferrer"
-                className="btn-glow flex-1 text-center"
-                style={{ textDecoration: "none", display: "block" }}
+          {/* Support */}
+          <div className="flex flex-col gap-2 stagger-5">
+            <a
+              href={POLAR_CHECKOUT_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-glow primary text-center"
+              style={{
+                textDecoration: "none",
+                display: "block",
+                fontFamily: "var(--font-mono)",
+              }}
+            >
+              ☕ {t.buyme}
+            </a>
+
+            {/* Existing social links */}
+            <div className="flex gap-2">
+              {SOCIAL.map(({ label, href }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-glow flex-1 text-center"
+                  style={{
+                    textDecoration: "none",
+                    display: "block",
+                  }}
+                >
+                  {label}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Crypto addresses */}
+          <div
+            className="glass-panel p-3.5 flex flex-col gap-2.5 stagger-6"
+            style={{
+              fontFamily: "var(--font-mono)",
+            }}
+          >
+            <div
+              className="text-xs"
+              style={{
+                color: "var(--c-green)",
+                letterSpacing: "0.08em",
+              }}
+            >
+              Coffee with CRYPTO
+            </div>
+
+            {CRYPTO.map(({ label, network, address }) => (
+              <div
+                key={`${label}-${network}`}
+                className="flex items-center gap-2"
+                style={{
+                  minWidth: 0,
+                }}
               >
-                {label}
-              </a>
+                <div className="shrink-0">{label === "ETH" ? "Ξ" : "●"}</div>
+
+                <div
+                  className="flex flex-col min-w-0 flex-1"
+                  style={{ gap: "0.1rem" }}
+                >
+                  <span
+                    style={{
+                      color: "var(--c-text)",
+                      fontSize: "0.7rem",
+                    }}
+                  >
+                    {label}
+                    <span
+                      style={{
+                        color: "var(--c-green)",
+                        letterSpacing: "0.08em",
+                      }}
+                    >
+                      · {network}
+                    </span>
+                  </span>
+
+                  <span
+                    style={{
+                      color: "var(--c-text-dim)",
+                      fontSize: "0.62rem",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {address}
+                  </span>
+                </div>
+
+                <CopyAddress address={address} />
+              </div>
             ))}
+            <span>{t.generosity}</span>
           </div>
         </div>
 

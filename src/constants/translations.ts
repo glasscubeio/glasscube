@@ -28,6 +28,9 @@ export const HOME_CONTENT: Record<
     resumeBtn: string;
     coverLetterBtn: string;
     openFor: string;
+    buyme: string;
+    copy: string;
+    generosity: string;
   }
 > = {
   en: {
@@ -43,6 +46,9 @@ export const HOME_CONTENT: Record<
     resumeBtn: "Download Resume",
     coverLetterBtn: "Cover Letter",
     openFor: "Open for opportunities",
+    buyme: "Buy me a coffee",
+    copy: "Copy",
+    generosity: "Your generosity will not be forgotten",
   },
   ko: {
     greeting: "포트폴리오에 오신 것을 환영합니다",
@@ -57,6 +63,10 @@ export const HOME_CONTENT: Record<
     resumeBtn: "이력서 다운로드",
     coverLetterBtn: "자기소개서",
     openFor: "기회 탐색 중",
+    buyme: "커피 한 잔 사주기",
+    copy: "복사",
+    generosity:
+      "당신의 작은 후원이 다음 작업을 이어가는 힘이 됩니다. 감사합니다.",
   },
   uz: {
     greeting: "Portfoliomga xush kelibsiz",
@@ -71,6 +81,10 @@ export const HOME_CONTENT: Record<
     resumeBtn: "Rezyume yuklab olish",
     coverLetterBtn: "Motivatsiya xat",
     openFor: "Imkoniyatlarga ochiq",
+    buyme: "Menga qahva olib bering",
+    copy: "Nusxalash",
+    generosity:
+      "Sizning kichik qo‘llab-quvvatlashingiz keyingi loyihalarim uchun katta motivatsiya bo‘ladi. Rahmat.",
   },
   ru: {
     greeting: "Добро пожаловать в моё портфолио",
@@ -85,6 +99,10 @@ export const HOME_CONTENT: Record<
     resumeBtn: "Скачать резюме",
     coverLetterBtn: "Сопр. письмо",
     openFor: "Открыт к предложениям",
+    buyme: "Угостить меня кофе",
+    copy: "Копировать",
+    generosity:
+      "Ваша небольшая поддержка помогает мне продолжать создавать новые проекты. Спасибо.",
   },
 };
 

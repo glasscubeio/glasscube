@@ -95,6 +95,11 @@ export const PROJECT_CONTENT: Record<
       name: "안티요이 게임",
       description: "인공지능(AI)과 경쟁하는 2D 턴제 전략 게임.",
     },
+    wallet: {
+      name: "암호화폐 지갑",
+      description:
+        "사용자가 디지털 자산을 안전하게 관리할 수 있는 암호화폐 지갑입니다.",
+    },
     "qr-demo": {
       name: "QR 생성기",
       description: "링크 및 텍스트 맞춤형 QR 코드 생성 도구.",
@@ -141,6 +146,11 @@ export const PROJECT_CONTENT: Record<
     chat: {
       name: "Maxfiy Chat",
       description: "Soketga asoslangan shaxsiy 1:1 matnli chat.",
+    },
+    wallet: {
+      name: "Kripto hamyon",
+      description:
+        "Foydalanuvchilarga raqamli aktivlarini xavfsiz boshqarish imkonini beruvchi kripto hamyon.",
     },
     "smart-scheduler": {
       name: "AI Rejalashtiruvchi",
@@ -198,6 +208,11 @@ export const PROJECT_CONTENT: Record<
     chat: {
       name: "Приватный Чат",
       description: "Мгновенный текстовый чат один на один на сокетах.",
+    },
+    wallet: {
+      name: "Криптокошелёк",
+      description:
+        "Криптокошелёк, позволяющий пользователям безопасно управлять своими цифровыми активами.",
     },
     "smart-scheduler": {
       name: "AI Планировщик",
@@ -291,6 +306,18 @@ export const PROJECTS: Project[] = [
     img: "/screenshots/study.png",
     demo: "https://study.glasscube.uz",
     github: "https://github.com/nodiry/smart-study-scheduler",
+    year: 2024,
+  },
+  {
+    id: "wallet",
+    name: "Crypto Wallet",
+    description:
+      "A crypto wallet that allows users to manage their digital assets securely.",
+    stack: ["TypeScript", "Elysia", "MongoDB", "React", "Memcached"],
+    status: "live",
+    img: "/screenshots/wallet.png",
+    demo: "https://wallet.glasscube.uz",
+    github: "https://github.com/nodiry/wallet",
     year: 2024,
   },
   {
