@@ -7,7 +7,8 @@ interface HomeProps {
   lang: Lang;
 }
 
-const POLAR_CHECKOUT_URL = "#";
+const POLAR_CHECKOUT_URL =
+  "https://buy.polar.sh/polar_cl_1F5TrGraoRHok68bvDd9AB2EfNNAMeHa3BSa13Mymr0";
 
 const CRYPTO = [
   {
