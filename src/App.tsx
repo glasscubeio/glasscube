@@ -19,10 +19,7 @@ function App() {
     document.title = `${t.document} — ${t.tab}`;
   };
 
-  // Polar redirects here after a successful donation
-  if (window.location.pathname === "/thanks") {
-    return <ThanksScreen />;
-  }
+  if (window.location.pathname === "/thanks") return <ThanksScreen />;
 
   if (!booted) return <BootScreen onBoot={handleBoot} />;
   if (!lang) return <LanguageSelect onSelect={handleLangSelect} />;
