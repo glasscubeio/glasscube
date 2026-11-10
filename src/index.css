@@ -54,7 +54,8 @@
   --accent: #e8500e;
 }
 
-:root[data-theme="dark"] {
+:root[data-theme="dark"],
+[data-void] {
   color-scheme: dark;
   --bg: #0d1117;
   --ink: #e8eaed;
@@ -71,4 +72,13 @@ body {
   font-size: var(--text-base);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+}
+
+[data-void] {
+  color: var(--ink);
+}
+
+[data-stage] .bg-bg,
+[data-stage] .bg-line {
+  background: transparent;
 }

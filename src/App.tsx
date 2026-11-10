@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useState, type ReactNode } from "react";
 import {
   CONTACT,
   CV,
@@ -14,6 +14,8 @@ import {
   type Lang,
 } from "@/content";
 import { CATEGORY_ICONS, LOGOS } from "@/icons";
+
+const Backstage = lazy(() => import("@/Backstage"));
 
 const initialLang = (): Lang =>
   navigator.language.startsWith("ko") ? "ko" : "en";
@@ -277,6 +279,7 @@ function ProjectPage({
 function App() {
   const [lang, setLang] = useState(initialLang);
   const [dark, setDark] = useState(false);
+  const [stage, setStage] = useState<number | null>(null);
   const [route, setRoute] = useState({ path: currentPath(), from: "", fromList: false });
   const open = PROJECTS.findIndex((p) => route.path === projectHref(p.slug));
   const listing = route.path === ALL_HREF;
@@ -315,7 +318,7 @@ function App() {
   useEffect(() => {
     if (route.path === "/" && route.from.startsWith(ALL_HREF))
       document.getElementById("work")?.scrollIntoView();
-    else scrollTo(0, 0);
+    else (document.querySelector("[data-stage]") ?? window).scrollTo(0, 0);
   }, [route]);
 
   useEffect(() => {
@@ -331,7 +334,12 @@ function App() {
     document.documentElement.dataset.theme = dark ? "dark" : "light";
   }, [dark]);
 
-  return (
+  const exitStage = (top: number) => {
+    setStage(null);
+    requestAnimationFrame(() => scrollTo(0, top));
+  };
+
+  const page = (
     <main className="mx-auto max-w-4xl px-4 py-10 sm:py-10">
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-line pb-3 font-mono text-xs text-muted">
         <span className="flex items-center gap-2">
@@ -352,6 +360,12 @@ function App() {
               {LANGS[l]}
             </button>
           ))}
+          <button
+            onClick={() => (stage === null ? setStage(scrollY) : exitStage(0))}
+            className="border-l border-line pl-3 hover:text-ink"
+          >
+            {t(stage === null ? UI.backstage : UI.exit)}
+          </button>
           <button
             onClick={() => setDark(!dark)}
             className="border-l border-line pl-3 hover:text-ink"
@@ -518,6 +532,19 @@ function App() {
         </span>
       </footer>
     </main>
+  );
+
+  if (stage === null) return page;
+  return (
+    <Suspense fallback={page}>
+      <Backstage
+        scrollY={stage}
+        labels={{ exit: t(UI.exit), walk: t(UI.walk), noCamera: t(UI.noCamera) }}
+        onExit={exitStage}
+      >
+        {page}
+      </Backstage>
+    </Suspense>
   );
 }
 
