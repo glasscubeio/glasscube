@@ -362,7 +362,7 @@ function App() {
           ))}
           <button
             onClick={() => (stage === null ? setStage(scrollY) : exitStage(0))}
-            className="border-l border-line pl-3 hover:text-ink"
+            className="hidden border-l border-line pl-3 hover:text-ink sm:inline"
           >
             {t(stage === null ? UI.backstage : UI.exit)}
           </button>
