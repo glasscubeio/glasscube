@@ -281,7 +281,6 @@ export default function Backstage({
         else if (walkable(nx, z)) camera.position.x = nx;
         else if (walkable(x, nz)) camera.position.z = nz;
       }
-      exhibition.update(now / 1000, dt);
       if (faceLight.intensity && frame++ % 15 === 0) faceLight.color.setRGB(...averageColor(video, sample), THREE.SRGBColorSpace);
       camera.rotation.set(view.pitch, view.yaw, 0);
       camera.getWorldDirection(forward);

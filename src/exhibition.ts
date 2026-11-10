@@ -1,18 +1,17 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { PROJECTS, type Lang } from "@/content";
-import { buildPresenter } from "@/presenter";
 
 export type Rect = { x: [number, number]; z: [number, number] };
 
 const CARPET = { z: -300, width: 300 };
 const WALKWAY = 800;
-const BOOTH = { width: 500, depth: 280, height: 460, gap: 120 };
+const BOOTH = { width: 500, depth: 280, height: 460, gap: 40, space: 140 };
 const PANEL = { width: 420, height: 260, y: 230, px: 4, tilt: THREE.MathUtils.degToRad(5) };
 const POST = { height: 100, every: 320 };
 const ROWS = Math.ceil(PROJECTS.length / 2);
 const HALL_START = -500 - WALKWAY;
-const HALL_END = HALL_START - ROWS * BOOTH.width;
+const HALL_END = HALL_START - ROWS * (BOOTH.width + BOOTH.space) + BOOTH.space;
 
 function matcap(light: string, mid: string, dark: string) {
   const canvas = document.createElement("canvas");
@@ -113,11 +112,7 @@ export function buildExhibition(scene: THREE.Scene, lang: Lang) {
   };
 
   const hallLength = HALL_START - HALL_END;
-  const floorDepth = BOOTH.depth + 80;
-  const hallFloor = flat(0xd9dbde);
   plane(WALKWAY + 40, CARPET.width, flat(0x8a8d91), -460 - (WALKWAY + 40) / 2, 0.6);
-  for (const side of [-1, 1])
-    plane(hallLength + 120, floorDepth, hallFloor, HALL_START - hallLength / 2, 0.3, CARPET.z + side * (CARPET.width / 2 + BOOTH.gap - 20 + floorDepth / 2));
   plane(hallLength, CARPET.width, flat(0xb3121c), HALL_START - hallLength / 2, 0.8);
 
   const gold = shaded("#fff4c2", "#c9a24a", "#4a3610");
@@ -152,17 +147,21 @@ export function buildExhibition(scene: THREE.Scene, lang: Lang) {
   const sideDepth = BOOTH.depth * 0.2;
   const wingGeometry = new THREE.BoxGeometry(8, BOOTH.height, sideDepth);
   const baseGeometry = new THREE.BoxGeometry(BOOTH.width, 8, BOOTH.depth);
+  const floorDepth = BOOTH.gap + BOOTH.depth + 60;
+  const floorGeometry = new THREE.PlaneGeometry(BOOTH.width, floorDepth).rotateX(-Math.PI / 2);
+  const floors: THREE.BufferGeometry[] = [];
   const panelGeometry = keep(new THREE.PlaneGeometry(PANEL.width, PANEL.height));
   const walls: THREE.BufferGeometry[] = [];
   const bases: THREE.BufferGeometry[] = [];
   const panels = PROJECTS.map((p, i) => {
     const side = i % 2 ? -1 : 1;
-    const x = HALL_START - BOOTH.width * (Math.floor(i / 2) + 0.5);
+    const x = HALL_START - (BOOTH.width + BOOTH.space) * Math.floor(i / 2) - BOOTH.width / 2;
     const near = CARPET.z + side * (CARPET.width / 2 + BOOTH.gap);
     const middle = near + (side * BOOTH.depth) / 2;
     const far = near + side * BOOTH.depth;
     const wing = far - (side * sideDepth) / 2;
     bases.push(placed(baseGeometry, x, 4, middle));
+    floors.push(placed(floorGeometry, x, 0.3, CARPET.z + side * (CARPET.width / 2 + floorDepth / 2)));
     walls.push(
       placed(back, x, BOOTH.height / 2, far),
       placed(wingGeometry, x - BOOTH.width / 2, BOOTH.height / 2, wing),
@@ -196,11 +195,8 @@ export function buildExhibition(scene: THREE.Scene, lang: Lang) {
 
   const occluder = add(mergeGeometries(walls), shaded("#ffffff", "#ecebe7", "#b9b8b2"));
   add(mergeGeometries(bases), flat(0xf4f4f1));
-  [...walls, ...bases, back, wingGeometry, baseGeometry].forEach((geometry) => geometry.dispose());
-
-  const presenter = buildPresenter(shaded, keep);
-  presenter.place(HALL_START - BOOTH.width / 2, 8, CARPET.z + CARPET.width / 2 + BOOTH.gap + 70);
-  scene.add(presenter.root);
+  add(mergeGeometries(floors), flat(0xd9dbde));
+  [...walls, ...bases, ...floors, back, wingGeometry, baseGeometry, floorGeometry].forEach((geometry) => geometry.dispose());
 
   let current = lang;
   const redraw = (next: Lang) => {
@@ -223,7 +219,6 @@ export function buildExhibition(scene: THREE.Scene, lang: Lang) {
     occluders: [occluder],
     panels: panels.map((b) => b.panel),
     redraw,
-    update: presenter.update,
     dispose: () => disposables.forEach((d) => d.dispose()),
   };
 }
