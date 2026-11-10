@@ -1,366 +1,183 @@
+import { mkdir } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import {
-  AlignmentType,
-  BorderStyle,
-  Document,
-  ImageRun,
-  LevelFormat,
-  Packer,
-  Paragraph,
-  TableLayoutType,
-  TabStopType,
-  ShadingType,
-  Table,
-  TableCell,
-  TableRow,
-  TextRun,
-  VerticalAlign,
-  WidthType,
-} from "docx";
-import {
+  CV,
   EDUCATION,
   EXPERIENCE,
   KEYWORDS,
-  PROJECTS,
+  FEATURED,
   SKILLS,
   UI,
   type Lang,
 } from "../src/content.ts";
 
-const OUT = `${import.meta.dir}/../public/cv`;
+const CHROME =
+  process.env.CHROME ?? "/Applications/chrome.app/Contents/MacOS/Google Chrome";
+const PUBLIC = `${import.meta.dir}/../public`;
 const PHONE = "+82 10-8173-7778";
 const EMAIL = "worknadir95@gmail.com";
 const LINKS = ["glasscube.uz", "linkedin.com/in/nodirbek-bokiev", "github.com/nodiry"];
-const ACCENT = "C2410C";
-const MUTED = "5B5F66";
-const A4 = { width: 11906, height: 16838 };
-const MARGIN = 720;
-const WIDTH = A4.width - MARGIN * 2;
 
 const month = (ym: string, lang: Lang) =>
-  new Date(`${ym}-01T00:00`).toLocaleDateString(lang === "ko" ? "ko" : "en", {
-    year: "numeric",
-    month: "short",
-  });
+  new Date(`${ym}-01T00:00`).toLocaleDateString(lang, { year: "numeric", month: "short" });
 const dot = (ym: string) => ym.replace("-", ".");
 const host = (url: string) => url.replace(/^https?:\/\//, "");
+const stack = (items: string[]) => `<p class="stack">${items.join(" · ")}</p>`;
 
-let font = "Arial";
-const run = (text: string, opts: Record<string, unknown> = {}) =>
-  new TextRun({ text, font, ...opts });
-
-const bullet = (text: string) =>
-  new Paragraph({
-    numbering: { reference: "bullets", level: 0 },
-    spacing: { after: 30 },
-    children: [run(text)],
-  });
-
-const heading = (text: string) =>
-  new Paragraph({
-    spacing: { before: 160, after: 60 },
-    keepNext: true,
-    border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "15171A", space: 2 } },
-    children: [run(text.toUpperCase(), { bold: true, size: 18, color: ACCENT, characterSpacing: 40 })],
-  });
-
-const rightTab = (left: TextRun[], right: string) =>
-  new Paragraph({
-    keepNext: true,
-    spacing: { before: 120 },
-    tabStops: [{ type: TabStopType.RIGHT, position: WIDTH }],
-    children: [
-      ...left,
-      run(`\t${right}`, { color: MUTED }),
-    ],
-  });
-
-const doc = (children: (Paragraph | Table)[]) =>
-  new Document({
-    styles: { default: { document: { run: { font, size: 19 } } } },
-    numbering: {
-      config: [
-        {
-          reference: "bullets",
-          levels: [
-            {
-              level: 0,
-              format: LevelFormat.BULLET,
-              text: "•",
-              alignment: AlignmentType.LEFT,
-              style: { paragraph: { indent: { left: 300, hanging: 220 } } },
-            },
-          ],
-        },
-      ],
-    },
-    sections: [
-      {
-        properties: { page: { size: A4, margin: { top: MARGIN, bottom: MARGIN, left: MARGIN, right: MARGIN } } },
-        children,
-      },
-    ],
-  });
+const page = (title: string, body: string) => `<!doctype html>
+<html><head><meta charset="utf-8"><title>${title}</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Sans+KR:wght@400;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 11mm 14mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 9.4pt/1.45 "IBM Plex Sans", "IBM Plex Sans KR", sans-serif; color: #15171a; }
+  h1 { font-size: 22pt; margin: 0; letter-spacing: -0.02em; }
+  h2 { font: 600 8pt "IBM Plex Mono", monospace; letter-spacing: 0.12em; text-transform: uppercase; color: #c2410c; border-bottom: 1px solid #15171a; padding-bottom: 2pt; margin: 10pt 0 4pt; }
+  h3 { font-size: 10pt; margin: 0; }
+  p, ul { margin: 0; }
+  ul { padding-left: 13pt; }
+  li::marker { color: #c2410c; }
+  a { color: inherit; text-decoration: none; }
+  .accent { color: #c2410c; font-weight: 600; }
+  .muted, .stack { color: #5b5f66; }
+  .stack { font: 7.6pt "IBM Plex Mono", monospace; margin-top: 2pt; }
+  .row { display: flex; justify-content: space-between; gap: 12pt; align-items: baseline; }
+  .item { margin-top: 6pt; break-inside: avoid; }
+  .skills { display: grid; grid-template-columns: 30mm 1fr; gap: 2pt 8pt; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { border: 1px solid #9aa1ab; padding: 4pt 6pt; vertical-align: middle; text-align: left; }
+  th { background: #efede6; text-align: center; white-space: nowrap; }
+  tr { break-inside: avoid; }
+</style></head><body>${body}</body></html>`;
 
 function english() {
   const lang: Lang = "en";
-  font = "Arial";
-  return doc([
-    new Paragraph({ children: [run(UI.name.en, { bold: true, size: 44 })] }),
-    new Paragraph({
-      spacing: { after: 40 },
-      children: [run(`${UI.title.en}  |  ${KEYWORDS.join(" · ")}`, { size: 22, color: ACCENT, bold: true })],
-    }),
-    new Paragraph({
-      children: [run(["Busan, South Korea", PHONE, EMAIL].join("  |  "), { color: MUTED, size: 18 })],
-    }),
-    new Paragraph({ children: [run(LINKS.join("  |  "), { color: MUTED, size: 18 })] }),
+  return page(
+    `${UI.name.en} CV`,
+    `
+    <h1>${UI.name.en}</h1>
+    <p class="accent" style="font-size:11pt">${UI.title.en} | ${KEYWORDS.join(" · ")}</p>
+    <p class="muted">Busan, South Korea | ${PHONE} | ${EMAIL}</p>
+    <p class="muted">${LINKS.join(" | ")}</p>
 
-    heading(UI.experience.en),
-    ...EXPERIENCE.flatMap((job) => [
-      rightTab(
-        [run(job.role.en, { bold: true }), run(`  ·  ${job.company}`, { bold: true })],
-        `${month(job.start, lang)} – ${job.end ? month(job.end, lang) : UI.present.en}`,
-      ),
-      new Paragraph({
-        keepNext: true,
-        spacing: { after: 40 },
-        children: [run(`${job.type.en} · ${job.place.en}`, { color: MUTED, size: 18 })],
-      }),
-      ...job.bullets.map((b) => bullet(b.en)),
-      new Paragraph({ children: [run(job.stack.join(" · "), { color: MUTED, size: 17 })] }),
-    ]),
+    <h2>${UI.experience.en}</h2>
+    ${EXPERIENCE.map(
+      (job) => `<div class="item">
+        <div class="row"><h3>${job.role.en} · ${job.company}</h3>
+          <span class="muted">${month(job.start, lang)} – ${job.end ? month(job.end, lang) : UI.present.en}</span></div>
+        <p class="muted">${job.type.en} · ${job.place.en}</p>
+        <ul>${job.bullets.map((b) => `<li>${b.en}</li>`).join("")}</ul>
+        ${stack(job.stack)}
+      </div>`,
+    ).join("")}
 
-    heading(UI.work.en),
-    ...PROJECTS.flatMap((p) => [
-      rightTab(
-        [run(p.name, { bold: true }), run(`  ·  ${p.tag.en}`, { color: ACCENT, size: 18 })],
-        host(p.demo),
-      ),
-      new Paragraph({ children: [run(p.description.en)] }),
-      new Paragraph({ children: [run(p.stack.join(" · "), { color: MUTED, size: 17 })] }),
-    ]),
+    <h2>${UI.work.en}</h2>
+    ${FEATURED.map(
+      (p) => `<div class="item">
+        <div class="row"><h3>${p.name} <span class="accent" style="font-size:8.5pt">· ${p.tag.en}</span></h3>
+          <span class="muted">${host(p.demo ?? p.github)}</span></div>
+        <p>${p.description.en}</p>
+        ${stack(p.stack)}
+      </div>`,
+    ).join("")}
 
-    heading(UI.skills.en),
-    ...SKILLS.map(
-      (s) =>
-        new Paragraph({
-          spacing: { after: 30 },
-          children: [run(`${s.title.en}: `, { bold: true }), run(s.items.join(", "))],
-        }),
-    ),
+    <h2>${UI.skills.en}</h2>
+    <div class="skills">${SKILLS.map(
+      (s) => `<b>${s.title.en}</b><span>${s.items.join(", ")}</span>`,
+    ).join("")}</div>
 
-    heading(UI.education.en),
-    rightTab(
-      [run(`${EDUCATION.school.en}  ·  ${EDUCATION.degree.en}`, { bold: true })],
-      `${EDUCATION.place.en} · ${EDUCATION.start} – ${EDUCATION.end}`,
-    ),
-
-    heading("Languages"),
-    new Paragraph({ children: [run("Korean: intermediate")] }),
-  ]);
+    <h2>${UI.education.en} & Languages</h2>
+    <div class="row"><h3>${EDUCATION.school.en} · ${EDUCATION.degree.en}</h3>
+      <span class="muted">${EDUCATION.place.en} · ${EDUCATION.start} – ${EDUCATION.end}</span></div>
+    <p>Korean: intermediate</p>`,
+  );
 }
 
-const cellBorder = { style: BorderStyle.SINGLE, size: 4, color: "9AA1AB" };
-const borders = { top: cellBorder, bottom: cellBorder, left: cellBorder, right: cellBorder };
-
-const cell = (
-  content: string | Paragraph[],
-  width: number,
-  opts: { head?: boolean } = {},
-) =>
-  new TableCell({
-    borders,
-    width: { size: width, type: WidthType.DXA },
-    verticalAlign: VerticalAlign.CENTER,
-    margins: { top: 60, bottom: 60, left: 100, right: 100 },
-    shading: opts.head ? { type: ShadingType.CLEAR, fill: "EFEDE6", color: "auto" } : undefined,
-    children:
-      typeof content === "string"
-        ? [
-            new Paragraph({
-              alignment: opts.head ? AlignmentType.CENTER : AlignmentType.LEFT,
-              children: [run(content, { bold: opts.head })],
-            }),
-          ]
-        : content,
-  });
-
-const table = (widths: number[], rows: TableRow[]) =>
-  new Table({
-    width: { size: WIDTH, type: WidthType.DXA },
-    layout: TableLayoutType.FIXED,
-    columnWidths: widths,
-    rows,
-  });
-
-const headRow = (labels: string[], widths: number[]) =>
-  new TableRow({ tableHeader: true, children: labels.map((l, i) => cell(l, widths[i], { head: true })) });
-
-const koHeading = (text: string) =>
-  new Paragraph({
-    spacing: { before: 280, after: 100 },
-    keepNext: true,
-    children: [run(`■ ${text}`, { bold: true, size: 24 })],
-  });
-
 async function korean() {
-  const photo = await Bun.file(`${import.meta.dir}/cv-photo.jpg`).arrayBuffer();
-  const photoW = 1900;
-  const labelW = 1400;
+  const photo = Buffer.from(await Bun.file(`${import.meta.dir}/cv-photo.jpg`).arrayBuffer()).toString("base64");
   const info: [string, string][] = [
     ["성명", `${UI.name.ko} (${UI.name.en})`],
-    ["지원분야", `${UI.title.ko} (결제 · Web3)`],
+    ["지원분야", `${UI.title.ko} (결제 · Web3 · AI)`],
     ["연락처", PHONE],
     ["이메일", EMAIL],
     ["주소", "부산광역시 사상구"],
-    ...LINKS.map((l, i): [string, string] => [i === 0 ? "포트폴리오" : "", l]),
+    ["포트폴리오", LINKS.join("<br>")],
   ];
+  const head = (labels: string[]) => `<tr>${labels.map((l) => `<th>${l}</th>`).join("")}</tr>`;
+  const section = (title: string, table: string) =>
+    `<h3 style="margin:14pt 0 5pt;font-size:11pt">■ ${title}</h3><table>${table}</table>`;
 
-  const expW = [1500, 1500, 1500, 1100, WIDTH - 5600];
-  const projW = [1800, WIDTH - 1800 - 2600, 2600];
-  const skillW = [2200, WIDTH - 2200];
-  const eduW = [2000, 2600, 2400, WIDTH - 7000];
+  return page(
+    `${UI.name.ko} 이력서`,
+    `
+    <h1 style="text-align:center;letter-spacing:0.5em;margin-bottom:12pt">이력서</h1>
+    <table>
+      ${info
+        .map(
+          ([label, value], i) => `<tr>
+          ${i === 0 ? `<td rowspan="${info.length}" style="width:32mm;text-align:center"><img src="data:image/jpeg;base64,${photo}" style="width:28mm;height:37mm;object-fit:cover"></td>` : ""}
+          <th style="width:26mm">${label}</th><td>${value}</td></tr>`,
+        )
+        .join("")}
+    </table>
 
-  font = "Malgun Gothic";
-  return doc([
-    new Paragraph({
-      alignment: AlignmentType.CENTER,
-      spacing: { after: 240 },
-      children: [run("이 력 서", { bold: true, size: 40, characterSpacing: 200 })],
-    }),
-    table([photoW, WIDTH - photoW], [
-      new TableRow({
-        children: [
-          cell(
-            [
-              new Paragraph({
-                alignment: AlignmentType.CENTER,
-                children: [
-                  new ImageRun({
-                    type: "jpg",
-                    data: photo,
-                    transformation: { width: 105, height: 140 },
-                  }),
-                ],
-              }),
-            ],
-            photoW,
-          ),
-          cell(
-            info.map(
-              ([label, value]) =>
-                new Paragraph({
-                  spacing: { after: 60 },
-                  tabStops: [{ type: TabStopType.LEFT, position: labelW }],
-                  children: [run(label, { bold: true }), run(`\t${value}`)],
-                }),
-            ),
-            WIDTH - photoW,
-          ),
-        ],
-      }),
-    ]),
+    ${section(
+      "학력사항",
+      `${head(["기간", "학교명", "전공", "소재지"])}
+      <tr><td>${EDUCATION.start} ~ ${EDUCATION.end}</td><td>${EDUCATION.school.ko}</td><td>${EDUCATION.degree.ko}</td><td>${EDUCATION.place.ko}</td></tr>`,
+    )}
 
-    koHeading("학력사항"),
-    table(eduW, [
-      headRow(["기간", "학교명", "전공", "소재지"], eduW),
-      new TableRow({
-        children: [
-          cell(`${EDUCATION.start} ~ ${EDUCATION.end}`, eduW[0]),
-          cell(EDUCATION.school.ko, eduW[1]),
-          cell(EDUCATION.degree.ko, eduW[2]),
-          cell(EDUCATION.place.ko, eduW[3]),
-        ],
-      }),
-    ]),
+    ${section(
+      "경력사항",
+      `${head(["근무기간", "회사명", "직무", "형태", "담당업무"])}
+      ${EXPERIENCE.map(
+        (job) => `<tr>
+          <td style="white-space:nowrap">${dot(job.start)} ~ ${job.end ? dot(job.end) : UI.present.ko}</td>
+          <td>${job.company}</td><td>${job.role.ko}</td><td style="white-space:nowrap">${job.type.ko}</td>
+          <td><ul>${job.bullets.map((b) => `<li>${b.ko}</li>`).join("")}</ul>${stack(job.stack)}</td></tr>`,
+      ).join("")}`,
+    )}
 
-    koHeading("경력사항"),
-    table(expW, [
-      headRow(["근무기간", "회사명", "직무", "형태", "담당업무"], expW),
-      ...EXPERIENCE.map(
-        (job) =>
-          new TableRow({
-            children: [
-              cell(`${dot(job.start)} ~ ${job.end ? dot(job.end) : UI.present.ko}`, expW[0]),
-              cell(job.company, expW[1]),
-              cell(job.role.ko, expW[2]),
-              cell(job.type.ko, expW[3]),
-              cell(
-                [
-                  ...job.bullets.map((b) => bullet(b.ko)),
-                  new Paragraph({ children: [run(job.stack.join(" · "), { color: MUTED, size: 17 })] }),
-                ],
-                expW[4],
-              ),
-            ],
-          }),
-      ),
-    ]),
+    ${section(
+      "주요 프로젝트",
+      `${head(["프로젝트", "내용", "기술"])}
+      ${FEATURED.map(
+        (p) => `<tr>
+          <td style="white-space:nowrap"><b>${p.name}</b><br><span class="accent" style="font-size:8pt">${p.tag.ko}</span></td>
+          <td>${p.description.ko}<br><span class="muted" style="font-size:8pt">${host(p.demo ?? p.github)}</span></td>
+          <td style="font-size:8pt">${p.stack.join(", ")}</td></tr>`,
+      ).join("")}`,
+    )}
 
-    koHeading("주요 프로젝트"),
-    table(projW, [
-      headRow(["프로젝트", "내용", "기술"], projW),
-      ...PROJECTS.map(
-        (p) =>
-          new TableRow({
-            children: [
-              cell(
-                [
-                  new Paragraph({ children: [run(p.name, { bold: true })] }),
-                  new Paragraph({ children: [run(p.tag.ko, { color: ACCENT, size: 17 })] }),
-                ],
-                projW[0],
-              ),
-              cell(
-                [
-                  new Paragraph({ children: [run(p.description.ko)] }),
-                  new Paragraph({ children: [run(host(p.demo), { color: MUTED, size: 17 })] }),
-                ],
-                projW[1],
-              ),
-              cell(
-                [new Paragraph({ children: [run(p.stack.join(", "), { size: 17 })] })],
-                projW[2],
-              ),
-            ],
-          }),
-      ),
-    ]),
+    ${section(
+      "보유 기술",
+      SKILLS.map((s) => `<tr><th style="width:32mm">${s.title.ko}</th><td>${s.items.join(", ")}</td></tr>`).join(""),
+    )}
 
-    koHeading("보유 기술"),
-    table(
-      skillW,
-      SKILLS.map(
-        (s) =>
-          new TableRow({
-            children: [cell(s.title.ko, skillW[0], { head: true }), cell(s.items.join(", "), skillW[1])],
-          }),
-      ),
-    ),
+    ${section("어학", `<tr><th style="width:32mm">한국어</th><td>중급</td></tr>`)}
 
-    koHeading("어학"),
-    table(skillW, [
-      new TableRow({ children: [cell("한국어", skillW[0], { head: true }), cell("중급", skillW[1])] }),
-    ]),
-
-    new Paragraph({
-      alignment: AlignmentType.CENTER,
-      spacing: { before: 480 },
-      children: [run("위의 기재 사항은 사실과 다름없음을 확인합니다.")],
-    }),
-    new Paragraph({
-      alignment: AlignmentType.CENTER,
-      spacing: { before: 200 },
-      children: [run(new Date().toLocaleDateString("ko", { year: "numeric", month: "long", day: "numeric" }))],
-    }),
-    new Paragraph({
-      alignment: AlignmentType.RIGHT,
-      spacing: { before: 200 },
-      children: [run(`작성자: ${UI.name.ko}  (인)`)],
-    }),
-  ]);
+    <p style="text-align:center;margin-top:22pt">위의 기재 사항은 사실과 다름없음을 확인합니다.</p>
+    <p style="text-align:center;margin-top:8pt">${new Date().toLocaleDateString("ko", { year: "numeric", month: "long", day: "numeric" })}</p>
+    <p style="text-align:right;margin-top:8pt">작성자: ${UI.name.ko} (인)</p>`,
+  );
 }
 
-await Bun.write(`${OUT}/Nodirbek_Bokiev_CV.docx`, await Packer.toBuffer(english()));
-await Bun.write(`${OUT}/Nodirbek_Bokiev_Iryeokseo.docx`, await Packer.toBuffer(await korean()));
-console.log("written");
+async function pdf(html: string, out: string) {
+  const file = `${tmpdir()}/cv-${crypto.randomUUID()}.html`;
+  await Bun.write(file, html);
+  const proc = Bun.spawn([
+    CHROME,
+    "--headless=new",
+    "--disable-gpu",
+    "--no-pdf-header-footer",
+    "--virtual-time-budget=10000",
+    `--print-to-pdf=${PUBLIC}${out}`,
+    `file://${file}`,
+  ], { stdout: "ignore", stderr: "ignore" });
+  await proc.exited;
+  console.log(`written ${out}`);
+}
+
+await mkdir(`${PUBLIC}/cv`, { recursive: true });
+await pdf(english(), CV.en);
+await pdf(await korean(), CV.ko);

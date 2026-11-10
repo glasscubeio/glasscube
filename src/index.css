@@ -10,15 +10,39 @@
   --font-mono: "IBM Plex Mono", "IBM Plex Sans KR", ui-monospace, monospace;
 }
 
-@theme {
-  --text-xs: 1rem;
-  --text-sm: 1.15rem;
-  --text-base: 1.3rem;
-  --text-lg: 1.5rem;
-  --text-xl: 1.65rem;
-  --text-2xl: 2rem;
-  --text-5xl: 4rem;
-  --text-7xl: 6rem;
+@theme inline {
+  --text-xs: var(--fs-xs);
+  --text-sm: var(--fs-sm);
+  --text-base: var(--fs-base);
+  --text-lg: var(--fs-lg);
+  --text-xl: var(--fs-xl);
+  --text-2xl: var(--fs-2xl);
+  --text-5xl: var(--fs-5xl);
+  --text-7xl: var(--fs-7xl);
+}
+
+:root {
+  --fs-xs: 0.8rem;
+  --fs-sm: 0.9rem;
+  --fs-base: 1.05rem;
+  --fs-lg: 1.2rem;
+  --fs-xl: 1.3rem;
+  --fs-2xl: 1.6rem;
+  --fs-5xl: 3rem;
+  --fs-7xl: 4.5rem;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --fs-xs: 1rem;
+    --fs-sm: 1.15rem;
+    --fs-base: 1.3rem;
+    --fs-lg: 1.5rem;
+    --fs-xl: 1.65rem;
+    --fs-2xl: 2rem;
+    --fs-5xl: 4rem;
+    --fs-7xl: 6rem;
+  }
 }
 
 :root {

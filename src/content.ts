@@ -14,6 +14,10 @@ export const UI = {
   present: { en: "Present", ko: "현재" },
   demo: { en: "Live", ko: "데모" },
   code: { en: "Code", ko: "코드" },
+  back: { en: "Back", ko: "뒤로" },
+  next: { en: "Next project", ko: "다음 프로젝트" },
+  viewAll: { en: "View all", ko: "전체 보기" },
+  allProjects: { en: "All projects", ko: "전체 프로젝트" },
   dark: { en: "Dark", ko: "다크" },
   light: { en: "Light", ko: "라이트" },
   cvEn: { en: "CV (English)", ko: "영문 CV" },
@@ -23,8 +27,8 @@ export const UI = {
 export const KEYWORDS = ["Payments", "Web3", "FastAPI", "React", "AWS"];
 
 export const CV = {
-  en: "/cv/Nodirbek_Bokiev_CV.docx",
-  ko: "/cv/Nodirbek_Bokiev_Iryeokseo.docx",
+  en: "/cv/Nodirbek_Bokiev_CV.pdf",
+  ko: "/cv/Nodirbek_Bokiev_Iryeokseo.pdf",
 };
 
 export const CONTACT = [
@@ -61,8 +65,8 @@ export const EXPERIENCE: {
         ko: "회사 마켓플레이스의 B2B 거래용 USDC 스테이블코인 결제를 개발하고 MoonPay 램프를 연동.",
       },
       {
-        en: "Backend mostly in FastAPI (about 80%), plus Spring Boot and NestJS. UIs in React and Vite.",
-        ko: "백엔드는 주로 FastAPI(약 80%), Spring Boot, NestJS. 프론트엔드는 React, Vite.",
+        en: "Built backend services in FastAPI, Spring Boot and NestJS, with React frontends.",
+        ko: "FastAPI, Spring Boot, NestJS로 백엔드 서비스를, React로 프론트엔드를 개발.",
       },
     ],
     stack: [
@@ -70,7 +74,6 @@ export const EXPERIENCE: {
       "FastAPI",
       "Spring Boot",
       "NestJS",
-      "React",
       "Toss",
       "Polar",
       "USDC",
@@ -79,6 +82,7 @@ export const EXPERIENCE: {
   },
   {
     company: "TARMOQDA",
+    url: "https://tarmoqda.uz",
     role: { en: "Full-Stack Engineer", ko: "풀스택 엔지니어" },
     type: { en: "Full-time", ko: "풀타임" },
     place: { en: "Uzbekistan · Remote", ko: "우즈베키스탄 · 원격" },
@@ -92,12 +96,19 @@ export const EXPERIENCE: {
         ko: "Hamkorbank(우즈베키스탄 은행) 카드 결제 연동.",
       },
     ],
-    stack: ["TypeScript", "Express", "React", "Vite"],
+    stack: [
+      "TypeScript",
+      "Express",
+      "Memcached",
+      "HamkorBank integration",
+      "React",
+    ],
     start: "2025-12",
     end: "2026-07",
   },
   {
     company: "SRZ MEMOR",
+    url: "https://srzmemor.uz",
     role: { en: "Full-Stack Developer", ko: "풀스택 개발자" },
     type: { en: "Part-time", ko: "파트타임" },
     place: {
@@ -106,25 +117,75 @@ export const EXPERIENCE: {
     },
     bullets: [
       {
-        en: "Built the company website and an internal platform for a construction materials manufacturer.",
-        ko: "건설 자재 제조사의 회사 웹사이트와 사내 플랫폼 개발.",
+        en: "Built and maintained the company website for a construction materials manufacturer.",
+        ko: "건설 자재 제조사의 회사 웹사이트 개발 및 유지보수.",
+      },
+      {
+        en: "Built and maintained custom internal tools for the company.",
+        ko: "회사 내부용 맞춤 도구 개발 및 유지보수.",
       },
     ],
-    stack: ["TypeScript", "Express", "React"],
+    stack: ["TypeScript", "Electron", "Memcached", "Express", "React"],
     start: "2025-03",
     end: "2025-11",
   },
 ];
 
+export type Details = {
+  facts?: { label: L; value: L }[];
+  sections?: {
+    title: L;
+    body?: L[];
+    images?: { src: string; caption?: L }[];
+  }[];
+};
+
 export const PROJECTS: {
+  slug: string;
   name: string;
-  tag: L;
+  featured?: boolean;
+  tag?: L;
   description: L;
   stack: string[];
-  demo: string;
+  demo?: string;
   github: string;
+  details?: Details;
 }[] = [
   {
+    slug: "breeze",
+    featured: true,
+    name: "Breeze",
+    tag: { en: "3rd place · DIVE 2025", ko: "DIVE 2025 3위" },
+    description: {
+      en: "Smartwatch app for safety at sea: tap-to-call emergency, typhoon alerts and AI fishing advice. I led the team.",
+      ko: "해상 안전 스마트워치 앱: 탭 긴급 호출, 태풍 경보, AI 낚시 분석. 팀장으로 참여.",
+    },
+    stack: ["Swift", "SwiftUI", "Kotlin", "Gemini", "HealthKit"],
+    github: "https://github.com/nodiry/DIVE2025",
+  },
+  {
+    slug: "smartscheduler",
+    featured: true,
+    name: "SmartScheduler",
+    tag: { en: "Award-winning paper", ko: "논문상 수상" },
+    description: {
+      en: "Graduation project: webcam focus tracking and adaptive study plans.",
+      ko: "졸업 프로젝트: 웹캠 집중도 추적과 맞춤형 학습 일정.",
+    },
+    stack: [
+      "TypeScript",
+      "React",
+      "MediaPipe",
+      "Three.js",
+      "Express",
+      "MongoDB",
+    ],
+    demo: "https://study.glasscube.uz",
+    github: "https://github.com/nodiry/smart-study-scheduler",
+  },
+  {
+    slug: "usdc-wallet",
+    featured: true,
     name: "USDC Wallet",
     tag: { en: "Testnet demo", ko: "테스트넷 데모" },
     description: {
@@ -143,6 +204,8 @@ export const PROJECTS: {
     github: "https://github.com/nodiry/wallet",
   },
   {
+    slug: "secure-chat",
+    featured: true,
     name: "Secure Chat",
     tag: { en: "Used by my team", ko: "팀 내 실사용" },
     description: {
@@ -154,6 +217,7 @@ export const PROJECTS: {
     github: "https://github.com/nodiry/chat-demo",
   },
   {
+    slug: "qr-studio",
     name: "QR Studio",
     tag: { en: "In regular use", ko: "실사용 중" },
     description: {
@@ -165,24 +229,65 @@ export const PROJECTS: {
     github: "https://github.com/nodiry/qr-demo",
   },
   {
-    name: "SmartScheduler",
-    tag: { en: "Award-winning paper", ko: "논문상 수상" },
+    slug: "algorithm-visualizer",
+    name: "Algorithm Visualizer",
     description: {
-      en: "Graduation project: webcam focus tracking and adaptive study plans.",
-      ko: "졸업 프로젝트: 웹캠 집중도 추적과 맞춤형 학습 일정.",
+      en: "Step through 19 algorithms with animations and synced code in TypeScript, Rust and Java.",
+      ko: "19개 알고리즘을 애니메이션과 TypeScript·Rust·Java 코드 하이라이트로 단계별 학습.",
     },
-    stack: [
-      "TypeScript",
-      "React",
-      "MediaPipe",
-      "Three.js",
-      "Express",
-      "MongoDB",
-    ],
-    demo: "https://study.glasscube.uz",
-    github: "https://github.com/nodiry/smart-study-scheduler",
+    stack: ["TypeScript", "React", "Framer Motion"],
+    demo: "https://algorithm.glasscube.uz",
+    github: "https://github.com/nodiry/algorithms",
+  },
+  {
+    slug: "hello-stranger",
+    name: "Hello Stranger",
+    description: {
+      en: "Anonymous random video chat over WebRTC. No accounts, no history.",
+      ko: "WebRTC 기반 익명 랜덤 영상 채팅. 계정과 기록 없음.",
+    },
+    stack: ["TypeScript", "WebRTC", "WebSocket", "Node.js", "React"],
+    demo: "https://stranger.glasscube.uz",
+    github: "https://github.com/nodiry/random-video-chat-demo",
+  },
+  {
+    slug: "analytics",
+    name: "Analytics",
+    tag: { en: "Archived", ko: "보관됨" },
+    description: {
+      en: "Self-hostable web analytics: add one script tag, get a full dashboard.",
+      ko: "스크립트 한 줄로 쓰는 셀프 호스팅 웹 분석 대시보드.",
+    },
+    stack: ["TypeScript", "Bun", "Elysia", "MongoDB", "React"],
+    demo: "https://analytics.glasscube.uz",
+    github: "https://github.com/nodiry/web-analytics",
+  },
+  {
+    slug: "music-player",
+    name: "Music Player",
+    description: {
+      en: "Minimal music player with smooth transitions and keyboard controls.",
+      ko: "부드러운 전환과 키보드 조작을 지원하는 미니멀 뮤직 플레이어.",
+    },
+    stack: ["React", "Bun", "Framer Motion"],
+    demo: "https://music.glasscube.uz",
+    github: "https://github.com/nodiry/music",
+  },
+  {
+    slug: "antiyoy",
+    name: "Antiyoy",
+    tag: { en: "Browser port", ko: "브라우저 포팅" },
+    description: {
+      en: "Browser port of yiotro's hex strategy game, with AI opponents and mobile support.",
+      ko: "yiotro의 헥스 전략 게임 Antiyoy 브라우저 포팅. AI 상대와 모바일 지원.",
+    },
+    stack: ["TypeScript", "React", "Bun"],
+    demo: "https://antiyoy.glasscube.uz",
+    github: "https://github.com/nodiry/web-antiyoy",
   },
 ];
+
+export const FEATURED = PROJECTS.filter((p) => p.featured);
 
 export const SKILLS: { title: L; items: string[] }[] = [
   {
