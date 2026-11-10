@@ -9,8 +9,10 @@ import {
 
 const FOV = 50;
 const EYE = 165;
-const PAGE = { width: 320, y: 180 };
-const FACE = { width: 1100, lift: 60, z: 1100 };
+const FACE = { width: 1100, lift: 300, z: 1100 };
+const PAGE = { width: FACE.width, y: 530, z: 500 };
+const TILT = THREE.MathUtils.degToRad(10);
+const END = new THREE.Vector3(0, EYE, -400);
 const STUDIO = { width: 1000, front: 60, curveAt: -700, radius: 220, height: 650 };
 const BOUNDS = { x: STUDIO.width / 2 - 40, zMin: STUDIO.curveAt + 20, zMax: STUDIO.front - 20 };
 const INTRO_MS = 2800;
@@ -76,10 +78,11 @@ export default function Backstage({
       height: `${innerHeight}px`,
       overflow: "auto",
       scrollbarWidth: "none",
-      background: "rgb(160 195 235 / 0.07)",
-      backdropFilter: "blur(1.5px)",
-      outline: "1px solid rgb(200 225 255 / 0.3)",
-      boxShadow: "0 0 140px rgb(150 195 255 / 0.18)",
+      background:
+        "linear-gradient(115deg, rgb(255 255 255 / 0.16), rgb(255 255 255 / 0.03) 35%, rgb(255 255 255 / 0) 60%, rgb(255 255 255 / 0.08)), rgb(190 215 255 / 0.05)",
+      backdropFilter: "blur(2px) saturate(140%) brightness(1.15)",
+      outline: "2px solid rgb(225 238 255 / 0.45)",
+      boxShadow: "inset 0 0 0 6px rgb(255 255 255 / 0.04), inset 0 0 80px rgb(200 225 255 / 0.12), 0 0 160px rgb(150 195 255 / 0.2)",
     });
     return el;
   });
@@ -116,11 +119,13 @@ export default function Backstage({
     const scale = PAGE.width / innerWidth;
     const pageObject = new CSS3DObject(page);
     pageObject.scale.setScalar(scale);
-    pageObject.position.set(0, PAGE.y, 0);
+    pageObject.position.set(0, PAGE.y, PAGE.z);
+    pageObject.rotation.x = -TILT;
+    const normal = new THREE.Vector3(0, Math.sin(TILT), Math.cos(TILT));
     scene.add(pageObject);
     const glow = new THREE.RectAreaLight(0xcfe0ff, 4, PAGE.width, innerHeight * scale);
-    glow.position.set(0, PAGE.y, 0);
-    glow.lookAt(0, PAGE.y, -1);
+    glow.position.copy(pageObject.position);
+    glow.rotation.x = -TILT;
     scene.add(glow);
 
     const video = document.createElement("video");
@@ -129,15 +134,15 @@ export default function Backstage({
     videoTexture.colorSpace = THREE.SRGBColorSpace;
     const faceMaterial = new THREE.MeshBasicMaterial({ color: 0x15171a });
     const face = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), faceMaterial);
-    face.rotation.y = Math.PI;
+    face.rotation.set(-TILT, Math.PI, 0);
     const fit = (aspect: number) => {
       face.scale.set(FACE.width, FACE.width / aspect, 1);
       face.position.set(0, FACE.lift + FACE.width / aspect / 2, FACE.z);
       faceLight.height = FACE.width / aspect;
       faceLight.position.copy(face.position);
-      faceLight.lookAt(0, face.position.y, 0);
     };
     const faceLight = new THREE.RectAreaLight(0xffffff, 0, FACE.width, FACE.width);
+    faceLight.rotation.x = -TILT;
     fit(16 / 9);
     scene.add(face, faceLight);
     const sample = document.createElement("canvas").getContext("2d", { willReadFrequently: true })!;
@@ -163,8 +168,10 @@ export default function Backstage({
     if (!navigator.mediaDevices) setCameraBlocked(true);
 
     const start = (innerHeight * scale) / 2 / Math.tan(THREE.MathUtils.degToRad(FOV / 2));
-    const view = { yaw: 0, pitch: 0 };
-    camera.position.set(0, PAGE.y, start);
+    const view = { yaw: 0, pitch: -TILT };
+    const from = pageObject.position.clone().addScaledVector(normal, start);
+    const through = pageObject.position.clone().addScaledVector(normal, -140);
+    camera.position.copy(from);
     const begin = performance.now();
     let last = begin;
     let walking = false;
@@ -219,9 +226,9 @@ export default function Backstage({
         const t = clamp((now - begin) / INTRO_MS, 0, 1);
         const dive = phase(t, 0, 0.55);
         const turn = phase(t, 0.35, 1);
-        camera.position.set(0, lerp(PAGE.y, EYE, turn), lerp(lerp(start, -140, dive), -480, turn));
+        camera.position.lerpVectors(from, through, dive).lerp(END, turn);
         view.yaw = lerp(0, Math.PI, turn);
-        view.pitch = lerp(0, 0.1, turn);
+        view.pitch = lerp(-TILT, 0.33, turn);
         walking = t === 1;
       } else {
         let ahead = 0;
@@ -239,9 +246,10 @@ export default function Backstage({
       if (faceLight.intensity && frame++ % 6 === 0) faceLight.color.setRGB(...averageColor(video, sample), THREE.SRGBColorSpace);
       camera.rotation.set(view.pitch, view.yaw, 0);
       camera.getWorldDirection(forward);
-      const depth = toObject.subVectors(pageObject.position, camera.position).dot(forward);
+      toObject.subVectors(pageObject.position, camera.position);
+      const depth = toObject.dot(forward);
       page.style.visibility = depth > 20 ? "visible" : "hidden";
-      page.style.opacity = String(clamp((Math.abs(camera.position.z) - 20) / 100, 0, 1));
+      page.style.opacity = String(clamp((Math.abs(toObject.dot(normal)) - 20) / 100, 0, 1));
       gl.render(scene, camera);
       css.render(scene, camera);
     });
