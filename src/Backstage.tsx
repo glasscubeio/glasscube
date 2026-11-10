@@ -6,15 +6,20 @@ import {
   CSS3DObject,
   CSS3DRenderer,
 } from "three/addons/renderers/CSS3DRenderer.js";
+import type { Lang } from "@/content";
+import { buildExhibition, type Rect } from "@/exhibition";
 
 const FOV = 50;
 const EYE = 165;
 const FACE = { width: 1100, lift: 300, z: 1100 };
-const PAGE = { width: FACE.width, y: 530, z: 500 };
+const PAGE = { width: FACE.width, y: 530, z: 800 };
 const TILT = THREE.MathUtils.degToRad(10);
 const END = new THREE.Vector3(0, EYE, -400);
 const STUDIO = { width: 1000, front: 60, curveAt: -700, radius: 220, height: 650 };
-const BOUNDS = { x: STUDIO.width / 2 - 40, zMin: STUDIO.curveAt + 20, zMax: STUDIO.front - 20 };
+const FLOOR: Rect = {
+  x: [-STUDIO.width / 2 + 40, STUDIO.width / 2 - 40],
+  z: [STUDIO.curveAt + 20, STUDIO.front - 20],
+};
 const INTRO_MS = 2800;
 const SPEED = 300;
 const KEYS: Record<string, [number, number]> = {
@@ -30,6 +35,7 @@ const KEYS: Record<string, [number, number]> = {
 
 const { clamp, lerp, smoothstep } = THREE.MathUtils;
 const phase = (t: number, from: number, to: number) => smoothstep(t, from, to);
+const inside = ({ x, z }: Rect, px: number, pz: number) => px >= x[0] && px <= x[1] && pz >= z[0] && pz <= z[1];
 
 function cyclorama({ width, front, curveAt, radius, height }: typeof STUDIO) {
   const profile: [number, number][] = [[front, 0]];
@@ -61,13 +67,17 @@ function averageColor(video: HTMLVideoElement, ctx: CanvasRenderingContext2D) {
 export default function Backstage({
   children,
   scrollY,
+  lang,
   labels,
   onExit,
+  onOpen,
 }: {
   children: ReactNode;
   scrollY: number;
+  lang: Lang;
   labels: { exit: string; walk: string; noCamera: string };
   onExit: (scrollTop: number) => void;
+  onOpen: (href: string) => void;
 }) {
   const stage = useRef<HTMLDivElement>(null);
   const [page] = useState(() => {
@@ -80,7 +90,6 @@ export default function Backstage({
       scrollbarWidth: "none",
       background:
         "linear-gradient(115deg, rgb(255 255 255 / 0.16), rgb(255 255 255 / 0.03) 35%, rgb(255 255 255 / 0) 60%, rgb(255 255 255 / 0.08)), rgb(190 215 255 / 0.05)",
-      backdropFilter: "blur(2px) saturate(140%) brightness(1.15)",
       outline: "2px solid rgb(225 238 255 / 0.45)",
       boxShadow: "inset 0 0 0 6px rgb(255 255 255 / 0.04), inset 0 0 80px rgb(200 225 255 / 0.12), 0 0 160px rgb(150 195 255 / 0.2)",
     });
@@ -89,6 +98,14 @@ export default function Backstage({
   const [cameraBlocked, setCameraBlocked] = useState(false);
   const exit = useRef(() => onExit(page.scrollTop));
   exit.current = () => onExit(page.scrollTop);
+  const open = useRef(onOpen);
+  open.current = onOpen;
+  const initialLang = useRef(lang);
+  const redraw = useRef<(lang: Lang) => void>(undefined);
+
+  useEffect(() => {
+    redraw.current?.(lang);
+  }, [lang]);
 
   useEffect(() => {
     page.scrollTop = scrollY;
@@ -101,7 +118,7 @@ export default function Backstage({
     camera.rotation.order = "YXZ";
 
     const gl = new THREE.WebGLRenderer({ antialias: true });
-    gl.setPixelRatio(Math.min(devicePixelRatio, 2));
+    gl.setPixelRatio(Math.min(devicePixelRatio, 1.5));
     const css = new CSS3DRenderer();
     css.domElement.style.overflow = "clip";
     for (const el of [gl.domElement, css.domElement]) {
@@ -115,6 +132,10 @@ export default function Backstage({
     const wall = new THREE.MeshStandardMaterial({ color: 0xe6e6e3, roughness: 0.55, side: THREE.DoubleSide });
     scene.add(new THREE.Mesh(cyclorama(STUDIO), wall));
     scene.add(new THREE.HemisphereLight(0xffffff, 0x000000, 0.06));
+    const exhibition = buildExhibition(scene, initialLang.current);
+    redraw.current = exhibition.redraw;
+    const areas = [FLOOR, exhibition.walkable];
+    const walkable = (x: number, z: number) => areas.some((area) => inside(area, x, z));
 
     const scale = PAGE.width / innerWidth;
     const pageObject = new CSS3DObject(page);
@@ -176,6 +197,7 @@ export default function Backstage({
     let last = begin;
     let walking = false;
     let frame = 0;
+    let shown = true;
 
     const held = new Set<string>();
     const onKeyDown = (e: KeyboardEvent) => {
@@ -203,6 +225,16 @@ export default function Backstage({
       if (drag?.moved) addEventListener("click", (e) => e.stopPropagation(), { capture: true, once: true });
       drag = undefined;
     };
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    const onClick = (e: MouseEvent) => {
+      const target = e.target as Element;
+      if (!walking || page.contains(target) || target.closest("button")) return;
+      pointer.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+      raycaster.setFromCamera(pointer, camera);
+      const href = raycaster.intersectObjects([...exhibition.panels, ...exhibition.occluders])[0]?.object.userData.href;
+      if (href) open.current(href);
+    };
     const onResize = () => {
       camera.aspect = innerWidth / innerHeight;
       camera.updateProjectionMatrix();
@@ -213,12 +245,14 @@ export default function Backstage({
     addEventListener("keydown", onKeyDown);
     addEventListener("keyup", onKeyUp);
     root.parentElement!.addEventListener("pointerdown", onPointerDown);
+    root.parentElement!.addEventListener("click", onClick);
     addEventListener("pointermove", onPointerMove);
     addEventListener("pointerup", onPointerUp);
     addEventListener("resize", onResize);
 
     const forward = new THREE.Vector3();
     const toObject = new THREE.Vector3();
+    const ray = new THREE.Vector3();
     gl.setAnimationLoop((now) => {
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
@@ -240,18 +274,30 @@ export default function Backstage({
         const step = SPEED * dt * (held.size ? 1 : 0);
         const sin = Math.sin(view.yaw);
         const cos = Math.cos(view.yaw);
-        camera.position.x = clamp(camera.position.x + (-sin * ahead + cos * side) * step, -BOUNDS.x, BOUNDS.x);
-        camera.position.z = clamp(camera.position.z + (-cos * ahead - sin * side) * step, BOUNDS.zMin, BOUNDS.zMax);
+        const { x, z } = camera.position;
+        const nx = x + (-sin * ahead + cos * side) * step;
+        const nz = z + (-cos * ahead - sin * side) * step;
+        if (walkable(nx, nz)) camera.position.set(nx, EYE, nz);
+        else if (walkable(nx, z)) camera.position.x = nx;
+        else if (walkable(x, nz)) camera.position.z = nz;
       }
-      if (faceLight.intensity && frame++ % 6 === 0) faceLight.color.setRGB(...averageColor(video, sample), THREE.SRGBColorSpace);
+      exhibition.update(now / 1000, dt);
+      if (faceLight.intensity && frame++ % 15 === 0) faceLight.color.setRGB(...averageColor(video, sample), THREE.SRGBColorSpace);
       camera.rotation.set(view.pitch, view.yaw, 0);
       camera.getWorldDirection(forward);
       toObject.subVectors(pageObject.position, camera.position);
-      const depth = toObject.dot(forward);
-      page.style.visibility = depth > 20 ? "visible" : "hidden";
-      page.style.opacity = String(clamp((Math.abs(toObject.dot(normal)) - 20) / 100, 0, 1));
+      const distance = toObject.length();
+      raycaster.set(camera.position, ray.copy(toObject).divideScalar(distance));
+      const blocked = camera.position.x < FLOOR.x[0] && (raycaster.intersectObjects(exhibition.occluders)[0]?.distance ?? Infinity) < distance;
+      const visible = toObject.dot(forward) > 20 && !blocked;
+      const opacity = String(clamp((Math.abs(toObject.dot(normal)) - 20) / 100, 0, 1));
+      if (visible !== shown) {
+        shown = visible;
+        page.style.visibility = visible ? "visible" : "hidden";
+      }
+      if (opacity !== page.style.opacity) page.style.opacity = opacity;
       gl.render(scene, camera);
-      css.render(scene, camera);
+      if (visible) css.render(scene, camera);
     });
 
     return () => {
@@ -261,12 +307,13 @@ export default function Backstage({
       removeEventListener("keydown", onKeyDown);
       removeEventListener("keyup", onKeyUp);
       root.parentElement!.removeEventListener("pointerdown", onPointerDown);
+      root.parentElement!.removeEventListener("click", onClick);
       removeEventListener("pointermove", onPointerMove);
       removeEventListener("pointerup", onPointerUp);
       removeEventListener("resize", onResize);
       scene.remove(pageObject);
       for (const mesh of scene.children) if (mesh instanceof THREE.Mesh) mesh.geometry.dispose();
-      for (const disposable of [wall, faceMaterial, videoTexture, gl]) disposable.dispose();
+      for (const disposable of [wall, faceMaterial, videoTexture, gl, exhibition]) disposable.dispose();
       root.replaceChildren();
     };
   }, [page]);
@@ -275,10 +322,10 @@ export default function Backstage({
     <div data-void className="fixed inset-0 touch-none overflow-hidden">
       <div ref={stage} className="absolute inset-0" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-4 font-mono text-xs text-muted">
-        <span>{cameraBlocked ? labels.noCamera : labels.walk}</span>
+        <span className="bg-black/60 px-2 py-1">{cameraBlocked ? labels.noCamera : labels.walk}</span>
         <button
           onClick={() => exit.current()}
-          className="pointer-events-auto border border-ink px-3 py-2 text-ink hover:border-accent hover:bg-accent hover:text-bg"
+          className="pointer-events-auto border border-ink bg-black/60 px-3 py-2 text-ink hover:border-accent hover:bg-accent hover:text-bg"
         >
           {labels.exit}
         </button>

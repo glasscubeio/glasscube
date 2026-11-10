@@ -339,6 +339,12 @@ function App() {
     requestAnimationFrame(() => scrollTo(0, top));
   };
 
+  const openProject = (href: string) => {
+    setStage(null);
+    history.pushState(null, "", href);
+    dispatchEvent(new PopStateEvent("popstate"));
+  };
+
   const page = (
     <main className="mx-auto max-w-4xl px-4 py-10 sm:py-10">
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-line pb-3 font-mono text-xs text-muted">
@@ -539,8 +545,10 @@ function App() {
     <Suspense fallback={page}>
       <Backstage
         scrollY={stage}
+        lang={lang}
         labels={{ exit: t(UI.exit), walk: t(UI.walk), noCamera: t(UI.noCamera) }}
         onExit={exitStage}
+        onOpen={openProject}
       >
         {page}
       </Backstage>

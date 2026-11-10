@@ -24,7 +24,7 @@ export const UI = {
   cvKo: { en: "이력서 (Korean)", ko: "국문 이력서" },
   backstage: { en: "Backstage", ko: "백스테이지" },
   exit: { en: "Exit", ko: "나가기" },
-  walk: { en: "WASD to walk · drag to look · Esc to exit", ko: "WASD 이동 · 드래그로 둘러보기 · Esc 나가기" },
+  walk: { en: "WASD to walk · drag to look · click a booth to open · Esc to exit", ko: "WASD 이동 · 드래그로 둘러보기 · 부스 클릭으로 열기 · Esc 나가기" },
   noCamera: { en: "Allow camera access to see yourself", ko: "카메라를 허용하면 자신을 볼 수 있어요" },
 } satisfies Record<string, L>;
 
