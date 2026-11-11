@@ -1,27 +1,26 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import * as THREE from "three";
-import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
 import {
   CSS3DObject,
   CSS3DRenderer,
 } from "three/addons/renderers/CSS3DRenderer.js";
-import type { Lang } from "@/content";
+import { UI, type Lang } from "@/content";
 import { buildExhibition, type Rect } from "@/exhibition";
 
 const FOV = 50;
 const EYE = 165;
-const FACE = { width: 1100, lift: 300, z: 1100 };
-const PAGE = { width: FACE.width, y: 530, z: 800 };
-const TILT = THREE.MathUtils.degToRad(10);
-const END = new THREE.Vector3(0, EYE, -400);
+const PAGE = { width: 1100, lift: 10, z: 0 };
+const END = { position: new THREE.Vector3(300, EYE, -500), yaw: 1.98, pitch: 0.05 };
 const STUDIO = { width: 1000, front: 60, curveAt: -700, radius: 220, height: 650 };
 const FLOOR: Rect = {
   x: [-STUDIO.width / 2 + 40, STUDIO.width / 2 - 40],
-  z: [STUDIO.curveAt + 20, STUDIO.front - 20],
+  z: [STUDIO.curveAt + 20, PAGE.z - 40],
 };
 const INTRO_MS = 2800;
 const SPEED = 300;
+const LOOK = 0.0022;
+const ESC_GRACE_MS = 300;
 const KEYS: Record<string, [number, number]> = {
   KeyW: [1, 0],
   ArrowUp: [1, 0],
@@ -52,7 +51,6 @@ function cyclorama({ width, front, curveAt, radius, height }: typeof STUDIO) {
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
   geometry.setIndex(index);
-  geometry.computeVertexNormals();
   return geometry;
 }
 
@@ -60,26 +58,26 @@ export default function Backstage({
   children,
   scrollY,
   lang,
-  labels,
   onExit,
   onOpen,
 }: {
   children: ReactNode;
   scrollY: number;
   lang: Lang;
-  labels: { exit: string; walk: string };
   onExit: (scrollTop: number) => void;
   onOpen: (href: string) => void;
 }) {
   const stage = useRef<HTMLDivElement>(null);
+  const [ready, setReady] = useState(false);
+  const [locked, setLocked] = useState(false);
+  const [aimed, setAimed] = useState(false);
   const [page] = useState(() => {
     const el = document.createElement("div");
     el.dataset.stage = "";
     Object.assign(el.style, {
       width: `${innerWidth}px`,
       height: `${innerHeight}px`,
-      overflow: "auto",
-      scrollbarWidth: "none",
+      overflow: "hidden",
       background:
         "linear-gradient(115deg, rgb(255 255 255 / 0.16), rgb(255 255 255 / 0.03) 35%, rgb(255 255 255 / 0) 60%, rgb(255 255 255 / 0.08)), rgb(190 215 255 / 0.05)",
       outline: "2px solid rgb(225 238 255 / 0.45)",
@@ -104,6 +102,7 @@ export default function Backstage({
 
   useEffect(() => {
     const root = stage.current!;
+    const frame = root.parentElement!;
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(FOV, innerWidth / innerHeight, 1, 12000);
     camera.rotation.order = "YXZ";
@@ -118,61 +117,24 @@ export default function Backstage({
       root.appendChild(el);
     }
 
-    RectAreaLightUniformsLib.init();
     scene.background = new THREE.Color(0x000000);
-    const wall = new THREE.MeshStandardMaterial({ color: 0xe6e6e3, roughness: 0.55, side: THREE.DoubleSide });
+    const wall = new THREE.MeshBasicMaterial({ color: 0xf6f5f1, side: THREE.DoubleSide });
     scene.add(new THREE.Mesh(cyclorama(STUDIO), wall));
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x000000, 0.06));
     const exhibition = buildExhibition(scene, initialLang.current);
     redraw.current = exhibition.redraw;
     const areas = [FLOOR, exhibition.walkable];
     const walkable = (x: number, z: number) => areas.some((area) => inside(area, x, z));
 
     const scale = PAGE.width / innerWidth;
+    const height = innerHeight * scale;
     const pageObject = new CSS3DObject(page);
     pageObject.scale.setScalar(scale);
-    pageObject.position.set(0, PAGE.y, PAGE.z);
-    pageObject.rotation.x = -TILT;
-    const normal = new THREE.Vector3(0, Math.sin(TILT), Math.cos(TILT));
+    pageObject.position.set(0, height / 2 + PAGE.lift, PAGE.z);
+    const normal = new THREE.Vector3(0, 0, 1);
     scene.add(pageObject);
-    const glow = new THREE.RectAreaLight(0xcfe0ff, 4, PAGE.width, innerHeight * scale);
-    glow.position.copy(pageObject.position);
-    glow.rotation.x = -TILT;
-    scene.add(glow);
 
-    const screenTime = { value: 0 };
-    const faceMaterial = new THREE.ShaderMaterial({
-      uniforms: { time: screenTime },
-      vertexShader: `varying vec2 vUv;
-void main() {
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}`,
-      fragmentShader: `uniform float time;
-varying vec2 vUv;
-float hash(vec2 p) {
-  return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
-}
-void main() {
-  float tick = floor(mod(time, 60.0) * 24.0);
-  float noise = hash(floor(vUv * vec2(400.0, 225.0)) + tick * vec2(13.1, 7.7));
-  float scan = 0.8 + 0.2 * sin(vUv.y * 900.0);
-  float roll = 0.75 + 0.25 * smoothstep(0.0, 0.12, abs(fract(vUv.y + time * 0.18) - 0.5));
-  vec2 c = vUv - 0.5;
-  float vignette = 1.0 - dot(c, c) * 1.1;
-  gl_FragColor = vec4(vec3(noise * scan * roll * vignette), 1.0);
-}`,
-    });
-    const face = new THREE.Mesh(new THREE.PlaneGeometry(FACE.width, FACE.width * 9 / 16), faceMaterial);
-    face.rotation.set(-TILT, Math.PI, 0);
-    face.position.set(0, FACE.lift + (FACE.width * 9) / 32, FACE.z);
-    const faceLight = new THREE.RectAreaLight(0xffffff, 2.2, FACE.width, (FACE.width * 9) / 16);
-    faceLight.rotation.x = -TILT;
-    faceLight.position.copy(face.position);
-    scene.add(face, faceLight);
-
-    const start = (innerHeight * scale) / 2 / Math.tan(THREE.MathUtils.degToRad(FOV / 2));
-    const view = { yaw: 0, pitch: -TILT };
+    const start = height / 2 / Math.tan(THREE.MathUtils.degToRad(FOV / 2));
+    const view = { yaw: 0, pitch: 0 };
     const from = pageObject.position.clone().addScaledVector(normal, start);
     const through = pageObject.position.clone().addScaledVector(normal, -140);
     camera.position.copy(from);
@@ -180,42 +142,50 @@ void main() {
     let last = begin;
     let walking = false;
     let shown = true;
+    let target: (() => void) | undefined;
+    let unlockedAt = -Infinity;
 
+    const isLocked = () => document.pointerLockElement === frame;
+    const lock = () => Promise.resolve(frame.requestPointerLock()).catch(() => {});
+    const onLockChange = () => {
+      if (!isLocked()) unlockedAt = performance.now();
+      setLocked(isLocked());
+    };
     const held = new Set<string>();
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.code === "Escape") return exit.current();
+      if (e.code === "Escape") {
+        if (!isLocked() && performance.now() - unlockedAt > ESC_GRACE_MS) exit.current();
+        return;
+      }
       if (!(e.code in KEYS)) return;
       e.preventDefault();
       held.add(e.code);
     };
     const onKeyUp = (e: KeyboardEvent) => held.delete(e.code);
-
-    let drag: { x: number; y: number; moved: boolean } | undefined;
+    const onMouseMove = (e: MouseEvent) => {
+      if (!walking || !isLocked()) return;
+      view.yaw -= e.movementX * LOOK;
+      view.pitch = clamp(view.pitch - e.movementY * LOOK, -1.2, 1.2);
+    };
     const onPointerDown = (e: PointerEvent) => {
-      drag = { x: e.clientX, y: e.clientY, moved: false };
+      if (e.button !== 0 || (e.target as Element).closest("button")) return;
+      if (isLocked()) target?.();
+      else lock();
     };
-    const onPointerMove = (e: PointerEvent) => {
-      if (!drag || !walking) return;
-      const dx = e.clientX - drag.x;
-      const dy = e.clientY - drag.y;
-      if (!drag.moved && Math.hypot(dx, dy) < 5) return;
-      drag = { x: e.clientX, y: e.clientY, moved: true };
-      view.yaw -= dx * 0.003;
-      view.pitch = clamp(view.pitch - dy * 0.003, -1.2, 1.2);
+    const onClickCapture = (e: MouseEvent) => {
+      if (!e.isTrusted || !page.contains(e.target as Node)) return;
+      e.preventDefault();
+      e.stopPropagation();
     };
-    const onPointerUp = () => {
-      if (drag?.moved) addEventListener("click", (e) => e.stopPropagation(), { capture: true, once: true });
-      drag = undefined;
-    };
+    const center = new THREE.Vector2();
     const raycaster = new THREE.Raycaster();
-    const pointer = new THREE.Vector2();
-    const onClick = (e: MouseEvent) => {
-      const target = e.target as Element;
-      if (!walking || page.contains(target) || target.closest("button")) return;
-      pointer.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
-      raycaster.setFromCamera(pointer, camera);
-      const href = raycaster.intersectObjects([...exhibition.panels, ...exhibition.occluders])[0]?.object.userData.href;
-      if (href) open.current(href);
+    const aim = (): (() => void) | undefined => {
+      const hit = shown ? document.elementFromPoint(innerWidth / 2, innerHeight / 2)?.closest<HTMLElement>("a, button") : null;
+      if (hit && page.contains(hit)) return () => hit.click();
+      raycaster.setFromCamera(center, camera);
+      const href: string | undefined = raycaster.intersectObjects([...exhibition.targets, ...exhibition.occluders])[0]?.object.userData.href;
+      if (!href) return undefined;
+      return href.startsWith("http") ? () => window.open(href, "_blank", "noopener") : () => open.current(href);
     };
     const onResize = () => {
       camera.aspect = innerWidth / innerHeight;
@@ -224,12 +194,13 @@ void main() {
       css.setSize(innerWidth, innerHeight);
     };
     onResize();
+    lock();
+    document.addEventListener("pointerlockchange", onLockChange);
     addEventListener("keydown", onKeyDown);
     addEventListener("keyup", onKeyUp);
-    root.parentElement!.addEventListener("pointerdown", onPointerDown);
-    root.parentElement!.addEventListener("click", onClick);
-    addEventListener("pointermove", onPointerMove);
-    addEventListener("pointerup", onPointerUp);
+    addEventListener("mousemove", onMouseMove);
+    frame.addEventListener("pointerdown", onPointerDown);
+    frame.addEventListener("click", onClickCapture, { capture: true });
     addEventListener("resize", onResize);
 
     const forward = new THREE.Vector3();
@@ -242,10 +213,11 @@ void main() {
         const t = clamp((now - begin) / INTRO_MS, 0, 1);
         const dive = phase(t, 0, 0.55);
         const turn = phase(t, 0.35, 1);
-        camera.position.lerpVectors(from, through, dive).lerp(END, turn);
-        view.yaw = lerp(0, Math.PI, turn);
-        view.pitch = lerp(-TILT, 0.33, turn);
+        camera.position.lerpVectors(from, through, dive).lerp(END.position, turn);
+        view.yaw = lerp(0, END.yaw, turn);
+        view.pitch = lerp(0, END.pitch, turn);
         walking = t === 1;
+        if (walking) setReady(true);
       } else {
         let ahead = 0;
         let side = 0;
@@ -264,8 +236,6 @@ void main() {
         else if (walkable(x, nz)) camera.position.z = nz;
       }
       exhibition.update(now / 1000, camera.position);
-      screenTime.value = now / 1000;
-      faceLight.intensity = 2 + Math.random() * 0.4;
       camera.rotation.set(view.pitch, view.yaw, 0);
       camera.getWorldDirection(forward);
       toObject.subVectors(pageObject.position, camera.position);
@@ -281,34 +251,50 @@ void main() {
       if (opacity !== page.style.opacity) page.style.opacity = opacity;
       gl.render(scene, camera);
       if (visible) css.render(scene, camera);
+      const next = walking && isLocked() ? aim() : undefined;
+      if (!next !== !target) setAimed(!!next);
+      target = next;
     });
 
     return () => {
       gl.setAnimationLoop(null);
+      if (isLocked()) document.exitPointerLock();
+      document.removeEventListener("pointerlockchange", onLockChange);
       removeEventListener("keydown", onKeyDown);
       removeEventListener("keyup", onKeyUp);
-      root.parentElement!.removeEventListener("pointerdown", onPointerDown);
-      root.parentElement!.removeEventListener("click", onClick);
-      removeEventListener("pointermove", onPointerMove);
-      removeEventListener("pointerup", onPointerUp);
+      removeEventListener("mousemove", onMouseMove);
+      frame.removeEventListener("pointerdown", onPointerDown);
+      frame.removeEventListener("click", onClickCapture, { capture: true });
       removeEventListener("resize", onResize);
       scene.remove(pageObject);
       for (const mesh of scene.children) if (mesh instanceof THREE.Mesh) mesh.geometry.dispose();
-      for (const disposable of [wall, faceMaterial, gl, exhibition]) disposable.dispose();
+      for (const disposable of [wall, gl, exhibition]) disposable.dispose();
       root.replaceChildren();
     };
   }, [page]);
 
   return (
-    <div data-void className="fixed inset-0 touch-none overflow-hidden">
+    <div data-void className="fixed inset-0 touch-none select-none overflow-hidden">
       <div ref={stage} className="absolute inset-0" />
+      {ready && (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center font-mono text-xs">
+          {locked ? (
+            <>
+              <span className={`size-2 rounded-full border border-black/60 ${aimed ? "bg-accent" : "bg-ink"}`} />
+              {aimed && <span className="absolute top-1/2 mt-4 bg-black/60 px-2 py-1 text-ink">{UI.open[lang]}</span>}
+            </>
+          ) : (
+            <span className="bg-black/60 px-3 py-2 text-ink">{UI.resume[lang]}</span>
+          )}
+        </div>
+      )}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-4 font-mono text-xs text-muted">
-        <span className="bg-black/60 px-2 py-1">{labels.walk}</span>
+        <span className="bg-black/60 px-2 py-1">{UI.walk[lang]}</span>
         <button
           onClick={() => exit.current()}
           className="pointer-events-auto border border-ink bg-black/60 px-3 py-2 text-ink hover:border-accent hover:bg-accent hover:text-bg"
         >
-          {labels.exit}
+          {UI.exit[lang]}
         </button>
       </div>
       {createPortal(children, page)}

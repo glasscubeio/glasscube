@@ -546,7 +546,6 @@ function App() {
       <Backstage
         scrollY={stage}
         lang={lang}
-        labels={{ exit: t(UI.exit), walk: t(UI.walk) }}
         onExit={exitStage}
         onOpen={openProject}
       >

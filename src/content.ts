@@ -24,7 +24,9 @@ export const UI = {
   cvKo: { en: "이력서 (Korean)", ko: "국문 이력서" },
   backstage: { en: "Backstage", ko: "백스테이지" },
   exit: { en: "Exit", ko: "나가기" },
-  walk: { en: "WASD to walk · drag to look · click a booth to open · Esc to exit", ko: "WASD 이동 · 드래그로 둘러보기 · 부스 클릭으로 열기 · Esc 나가기" },
+  walk: { en: "WASD to walk · mouse to look · click what the dot is on · Esc to pause", ko: "WASD 이동 · 마우스로 둘러보기 · 점이 가리키는 대상 클릭 · Esc 일시정지" },
+  resume: { en: "Click to look around · Esc to exit", ko: "클릭해서 둘러보기 · Esc 나가기" },
+  open: { en: "Click to open", ko: "클릭해서 열기" },
 } satisfies Record<string, L>;
 
 export const KEYWORDS = ["Payments", "Web3", "FastAPI", "React", "AWS"];
@@ -264,17 +266,6 @@ export const PROJECTS: {
     stack: ["TypeScript", "Bun", "Elysia", "MongoDB", "React"],
     demo: "https://analytics.glasscube.uz",
     github: "https://github.com/nodiry/web-analytics",
-  },
-  {
-    slug: "music-player",
-    name: "Music Player",
-    description: {
-      en: "Minimal music player with smooth transitions and keyboard controls.",
-      ko: "부드러운 전환과 키보드 조작을 지원하는 미니멀 뮤직 플레이어.",
-    },
-    stack: ["React", "Bun", "Framer Motion"],
-    demo: "https://music.glasscube.uz",
-    github: "https://github.com/nodiry/music",
   },
   {
     slug: "antiyoy",

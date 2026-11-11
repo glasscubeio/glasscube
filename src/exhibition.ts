@@ -1,7 +1,12 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
-import { PROJECTS, type Lang } from "@/content";
-import { buildWalletHologram } from "@/hologram";
+import { PROJECTS, UI, type L, type Lang } from "@/content";
+import { buildBreezeHologram } from "@/breeze";
+import { buildChatHologram } from "@/chat";
+import { buildQrHologram } from "@/qr";
+import type { Keep, Shade } from "@/hologram";
+import { buildSchedulerHologram } from "@/scheduler";
+import { buildWalletHologram } from "@/wallet";
 
 export type Rect = { x: [number, number]; z: [number, number] };
 
@@ -10,6 +15,9 @@ const WALKWAY = 800;
 const BOOTH = { width: 500, depth: 280, height: 560, gap: 40, space: 140 };
 const PANEL = { width: 420, height: 260, y: 400, px: 4, tilt: THREE.MathUtils.degToRad(5) };
 const POST = { height: 100, every: 320 };
+const BUTTON = { width: 70, height: 26, y: 120, inset: 50, depth: 30, bob: 3, px: 6 };
+const LAMP = { y: 720, cable: 2400, color: 0xfff1dc, penumbra: 0.6 };
+const WALKWAY_LAMPS = [-680, -1080];
 const ROWS = Math.ceil(PROJECTS.length / 2);
 const HALL_START = -500 - WALKWAY;
 const HALL_END = HALL_START - ROWS * (BOOTH.width + BOOTH.space) + BOOTH.space;
@@ -34,6 +42,14 @@ const placed = (geometry: THREE.BufferGeometry, x: number, y: number, z: number)
 
 const host = (url: string) => url.replace(/^https?:\/\//, "");
 
+const HOLOGRAMS: Record<string, (shade: Shade, keep: Keep) => { group: THREE.Group; update: (seconds: number) => void }> = {
+  "usdc-wallet": (shade, keep) => buildWalletHologram("/booths/usdc-wallet.jpg", shade, keep),
+  smartscheduler: buildSchedulerHologram,
+  breeze: buildBreezeHologram,
+  "secure-chat": buildChatHologram,
+  "qr-studio": buildQrHologram,
+};
+
 function wrap(ctx: CanvasRenderingContext2D, text: string, width: number) {
   const lines: string[] = [];
   let line = "";
@@ -45,6 +61,20 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, width: number) {
     } else line = next;
   }
   return line ? [...lines, line] : lines;
+}
+
+function label(ctx: CanvasRenderingContext2D, text: string) {
+  const { width, height } = ctx.canvas;
+  ctx.fillStyle = "#0d1117";
+  ctx.fillRect(0, 0, width, height);
+  ctx.strokeStyle = "#e8eaed";
+  ctx.lineWidth = 8;
+  ctx.strokeRect(4, 4, width - 8, height - 8);
+  ctx.fillStyle = "#e8eaed";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.font = '500 64px "IBM Plex Mono", "IBM Plex Sans KR", monospace';
+  ctx.fillText(`${text} ↗`, width / 2, height / 2, width - 40);
 }
 
 function draw(ctx: CanvasRenderingContext2D, index: number, lang: Lang, image?: HTMLImageElement) {
@@ -103,7 +133,7 @@ export function buildExhibition(scene: THREE.Scene, lang: Lang) {
     scene.add(mesh);
     return mesh;
   };
-  const flat = (color: number) => keep(new THREE.MeshBasicMaterial({ color }));
+  const lit = (color: number) => keep(new THREE.MeshLambertMaterial({ color }));
   const shaded = (...stops: [string, string, string]) => {
     const texture = keep(matcap(...stops));
     return keep(new THREE.MeshMatcapMaterial({ matcap: texture }));
@@ -113,8 +143,32 @@ export function buildExhibition(scene: THREE.Scene, lang: Lang) {
   };
 
   const hallLength = HALL_START - HALL_END;
-  plane(WALKWAY + 40, CARPET.width, flat(0x8a8d91), -460 - (WALKWAY + 40) / 2, 0.6);
-  plane(hallLength, CARPET.width, flat(0xb3121c), HALL_START - hallLength / 2, 0.8);
+  plane(WALKWAY + 40, CARPET.width, lit(0x8a8d91), -460 - (WALKWAY + 40) / 2, 0.6);
+  plane(hallLength, CARPET.width, lit(0xb3121c), HALL_START - hallLength / 2, 0.8);
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x404040, 0.8));
+  const heads: THREE.BufferGeometry[] = [];
+  const lenses: THREE.BufferGeometry[] = [];
+  const cables: THREE.BufferGeometry[] = [];
+  const headGeometry = new THREE.CylinderGeometry(12, 18, 34, 20).translate(0, 17, 0);
+  const lensGeometry = new THREE.CircleGeometry(15, 20).rotateX(Math.PI / 2).translate(0, -0.5, 0);
+  const cableGeometry = new THREE.CylinderGeometry(1, 1, LAMP.cable - LAMP.y).translate(0, (LAMP.cable - LAMP.y) / 2, 0);
+  const down = new THREE.Vector3(0, -1, 0);
+  const lamp = (x: number, z: number, target: THREE.Vector3, angle: number, intensity: number) => {
+    const light = new THREE.SpotLight(LAMP.color, intensity, 0, angle, LAMP.penumbra, 0);
+    light.position.set(x, LAMP.y, z);
+    light.target.position.copy(target);
+    scene.add(light, light.target);
+    const aim = new THREE.Matrix4().compose(
+      light.position,
+      new THREE.Quaternion().setFromUnitVectors(down, target.clone().sub(light.position).normalize()),
+      new THREE.Vector3(1, 1, 1),
+    );
+    heads.push(headGeometry.clone().applyMatrix4(aim));
+    lenses.push(lensGeometry.clone().applyMatrix4(aim));
+    cables.push(placed(cableGeometry, x, LAMP.y, z));
+  };
+  for (const x of WALKWAY_LAMPS) lamp(x, CARPET.z, new THREE.Vector3(x, 0, CARPET.z), 0.5, 2.6);
 
   const gold = shaded("#fff4c2", "#c9a24a", "#4a3610");
   const parts = [
@@ -154,7 +208,9 @@ export function buildExhibition(scene: THREE.Scene, lang: Lang) {
   const panelGeometry = keep(new THREE.PlaneGeometry(PANEL.width, PANEL.height));
   const walls: THREE.BufferGeometry[] = [];
   const bases: THREE.BufferGeometry[] = [];
-  let hologram: ReturnType<typeof buildWalletHologram> | undefined;
+  const holograms: ReturnType<(typeof HOLOGRAMS)[string]>[] = [];
+  const buttonGeometry = keep(new THREE.PlaneGeometry(BUTTON.width, BUTTON.height));
+  const buttons: { mesh: THREE.Mesh; ctx: CanvasRenderingContext2D; texture: THREE.CanvasTexture; text: L }[] = [];
   const panels = PROJECTS.map((p, i) => {
     const side = i % 2 ? -1 : 1;
     const x = HALL_START - (BOOTH.width + BOOTH.space) * Math.floor(i / 2) - BOOTH.width / 2;
@@ -163,11 +219,31 @@ export function buildExhibition(scene: THREE.Scene, lang: Lang) {
     const far = near + side * BOOTH.depth;
     const wing = far - (side * sideDepth) / 2;
     bases.push(placed(baseGeometry, x, 4, middle));
-    if (p.slug === "usdc-wallet") {
-      hologram = buildWalletHologram("/booths/usdc-wallet.jpg", shaded, keep);
+    lamp(x, near + side * 40, new THREE.Vector3(x, 160, far), 0.45, 3);
+    const hologram = HOLOGRAMS[p.slug]?.(shaded, keep);
+    if (hologram) {
       hologram.group.position.set(x, 8, near + side * 125);
       hologram.group.rotation.y = side > 0 ? Math.PI : 0;
       scene.add(hologram.group);
+      holograms.push(hologram);
+    }
+    const links = [
+      { href: p.demo, text: UI.demo, slot: 1 },
+      { href: p.github, text: UI.code, slot: -1 },
+    ];
+    for (const { href, text, slot } of links) {
+      if (!href) continue;
+      const canvas = document.createElement("canvas");
+      canvas.width = BUTTON.width * BUTTON.px;
+      canvas.height = BUTTON.height * BUTTON.px;
+      const texture = keep(new THREE.CanvasTexture(canvas));
+      texture.colorSpace = THREE.SRGBColorSpace;
+      const mesh = new THREE.Mesh(buttonGeometry, keep(new THREE.MeshBasicMaterial({ map: texture })));
+      mesh.position.set(x + side * slot * (BOOTH.width / 2 - BUTTON.inset), BUTTON.y, near + side * BUTTON.depth);
+      mesh.rotation.y = side > 0 ? Math.PI : 0;
+      mesh.userData.href = href;
+      scene.add(mesh);
+      buttons.push({ mesh, ctx: canvas.getContext("2d")!, texture, text });
     }
     floors.push(placed(floorGeometry, x, 0.3, CARPET.z + side * (CARPET.width / 2 + floorDepth / 2)));
     walls.push(
@@ -201,16 +277,23 @@ export function buildExhibition(scene: THREE.Scene, lang: Lang) {
     return booth;
   });
 
-  const occluder = add(mergeGeometries(walls), shaded("#ffffff", "#ecebe7", "#b9b8b2"));
-  add(mergeGeometries(bases), flat(0xf4f4f1));
-  add(mergeGeometries(floors), flat(0xd9dbde));
-  [...walls, ...bases, ...floors, back, wingGeometry, baseGeometry, floorGeometry].forEach((geometry) => geometry.dispose());
+  const occluder = add(mergeGeometries(walls), lit(0xf1f0ec));
+  add(mergeGeometries(bases), lit(0xf4f4f1));
+  add(mergeGeometries(floors), lit(0xd9dbde));
+  add(mergeGeometries(heads), shaded("#6b7078", "#2a2d32", "#0a0b0d"));
+  add(mergeGeometries(lenses), keep(new THREE.MeshBasicMaterial({ color: LAMP.color })));
+  add(mergeGeometries(cables), keep(new THREE.MeshBasicMaterial({ color: 0x111111 })));
+  [...walls, ...bases, ...floors, ...heads, ...lenses, ...cables, back, wingGeometry, baseGeometry, floorGeometry, headGeometry, lensGeometry, cableGeometry].forEach((geometry) => geometry.dispose());
 
   let current = lang;
   const redraw = (next: Lang) => {
     current = next;
     panels.forEach((b, i) => {
       draw(b.ctx, i, next, b.image);
+      b.texture.needsUpdate = true;
+    });
+    buttons.forEach((b) => {
+      label(b.ctx, b.text[next]);
       b.texture.needsUpdate = true;
     });
   };
@@ -225,12 +308,14 @@ export function buildExhibition(scene: THREE.Scene, lang: Lang) {
   return {
     walkable,
     occluders: [occluder],
-    panels: panels.map((b) => b.panel),
+    targets: [...panels.map((b) => b.panel), ...buttons.map((b) => b.mesh)],
     redraw,
     update: (seconds: number, viewer: THREE.Vector3) => {
-      if (!hologram) return;
-      hologram.group.visible = viewer.distanceTo(hologram.group.position) < 1800;
-      if (hologram.group.visible) hologram.update(seconds);
+      buttons.forEach((b, i) => (b.mesh.position.y = BUTTON.y + Math.sin(seconds * 1.5 + i) * BUTTON.bob));
+      for (const hologram of holograms) {
+        hologram.group.visible = viewer.distanceTo(hologram.group.position) < 1800;
+        if (hologram.group.visible) hologram.update(seconds);
+      }
     },
     dispose: () => disposables.forEach((d) => d.dispose()),
   };
