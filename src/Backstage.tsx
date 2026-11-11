@@ -56,14 +56,6 @@ function cyclorama({ width, front, curveAt, radius, height }: typeof STUDIO) {
   return geometry;
 }
 
-function averageColor(video: HTMLVideoElement, ctx: CanvasRenderingContext2D) {
-  ctx.drawImage(video, 0, 0, 8, 8);
-  const data = ctx.getImageData(0, 0, 8, 8).data;
-  const sum = [0, 0, 0];
-  for (let i = 0; i < data.length; i += 4) for (let c = 0; c < 3; c++) sum[c] += data[i + c];
-  return sum.map((v) => v / 64 / 255) as [number, number, number];
-}
-
 export default function Backstage({
   children,
   scrollY,
@@ -75,7 +67,7 @@ export default function Backstage({
   children: ReactNode;
   scrollY: number;
   lang: Lang;
-  labels: { exit: string; walk: string; noCamera: string };
+  labels: { exit: string; walk: string };
   onExit: (scrollTop: number) => void;
   onOpen: (href: string) => void;
 }) {
@@ -95,7 +87,6 @@ export default function Backstage({
     });
     return el;
   });
-  const [cameraBlocked, setCameraBlocked] = useState(false);
   const exit = useRef(() => onExit(page.scrollTop));
   exit.current = () => onExit(page.scrollTop);
   const open = useRef(onOpen);
@@ -149,44 +140,36 @@ export default function Backstage({
     glow.rotation.x = -TILT;
     scene.add(glow);
 
-    const video = document.createElement("video");
-    video.muted = video.autoplay = video.playsInline = true;
-    const videoTexture = new THREE.VideoTexture(video);
-    videoTexture.colorSpace = THREE.SRGBColorSpace;
-    const faceMaterial = new THREE.MeshBasicMaterial({ color: 0x15171a });
-    const face = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), faceMaterial);
+    const screenTime = { value: 0 };
+    const faceMaterial = new THREE.ShaderMaterial({
+      uniforms: { time: screenTime },
+      vertexShader: `varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}`,
+      fragmentShader: `uniform float time;
+varying vec2 vUv;
+float hash(vec2 p) {
+  return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+}
+void main() {
+  float tick = floor(mod(time, 60.0) * 24.0);
+  float noise = hash(floor(vUv * vec2(400.0, 225.0)) + tick * vec2(13.1, 7.7));
+  float scan = 0.8 + 0.2 * sin(vUv.y * 900.0);
+  float roll = 0.75 + 0.25 * smoothstep(0.0, 0.12, abs(fract(vUv.y + time * 0.18) - 0.5));
+  vec2 c = vUv - 0.5;
+  float vignette = 1.0 - dot(c, c) * 1.1;
+  gl_FragColor = vec4(vec3(noise * scan * roll * vignette), 1.0);
+}`,
+    });
+    const face = new THREE.Mesh(new THREE.PlaneGeometry(FACE.width, FACE.width * 9 / 16), faceMaterial);
     face.rotation.set(-TILT, Math.PI, 0);
-    const fit = (aspect: number) => {
-      face.scale.set(FACE.width, FACE.width / aspect, 1);
-      face.position.set(0, FACE.lift + FACE.width / aspect / 2, FACE.z);
-      faceLight.height = FACE.width / aspect;
-      faceLight.position.copy(face.position);
-    };
-    const faceLight = new THREE.RectAreaLight(0xffffff, 0, FACE.width, FACE.width);
+    face.position.set(0, FACE.lift + (FACE.width * 9) / 32, FACE.z);
+    const faceLight = new THREE.RectAreaLight(0xffffff, 2.2, FACE.width, (FACE.width * 9) / 16);
     faceLight.rotation.x = -TILT;
-    fit(16 / 9);
+    faceLight.position.copy(face.position);
     scene.add(face, faceLight);
-    const sample = document.createElement("canvas").getContext("2d", { willReadFrequently: true })!;
-    video.onloadedmetadata = () => {
-      fit(video.videoWidth / video.videoHeight);
-      faceMaterial.color.set(0xffffff);
-      faceMaterial.map = videoTexture;
-      faceMaterial.needsUpdate = true;
-      faceLight.intensity = 3;
-    };
-
-    let stream: MediaStream | undefined;
-    let disposed = false;
-    navigator.mediaDevices
-      ?.getUserMedia({ video: { width: 1280, height: 720, facingMode: "user" } })
-      .then((s) => {
-        if (disposed) return s.getTracks().forEach((track) => track.stop());
-        stream = s;
-        video.srcObject = s;
-        video.play();
-      })
-      .catch(() => setCameraBlocked(true));
-    if (!navigator.mediaDevices) setCameraBlocked(true);
 
     const start = (innerHeight * scale) / 2 / Math.tan(THREE.MathUtils.degToRad(FOV / 2));
     const view = { yaw: 0, pitch: -TILT };
@@ -196,7 +179,6 @@ export default function Backstage({
     const begin = performance.now();
     let last = begin;
     let walking = false;
-    let frame = 0;
     let shown = true;
 
     const held = new Set<string>();
@@ -281,7 +263,9 @@ export default function Backstage({
         else if (walkable(nx, z)) camera.position.x = nx;
         else if (walkable(x, nz)) camera.position.z = nz;
       }
-      if (faceLight.intensity && frame++ % 15 === 0) faceLight.color.setRGB(...averageColor(video, sample), THREE.SRGBColorSpace);
+      exhibition.update(now / 1000, camera.position);
+      screenTime.value = now / 1000;
+      faceLight.intensity = 2 + Math.random() * 0.4;
       camera.rotation.set(view.pitch, view.yaw, 0);
       camera.getWorldDirection(forward);
       toObject.subVectors(pageObject.position, camera.position);
@@ -300,8 +284,6 @@ export default function Backstage({
     });
 
     return () => {
-      disposed = true;
-      stream?.getTracks().forEach((track) => track.stop());
       gl.setAnimationLoop(null);
       removeEventListener("keydown", onKeyDown);
       removeEventListener("keyup", onKeyUp);
@@ -312,7 +294,7 @@ export default function Backstage({
       removeEventListener("resize", onResize);
       scene.remove(pageObject);
       for (const mesh of scene.children) if (mesh instanceof THREE.Mesh) mesh.geometry.dispose();
-      for (const disposable of [wall, faceMaterial, videoTexture, gl, exhibition]) disposable.dispose();
+      for (const disposable of [wall, faceMaterial, gl, exhibition]) disposable.dispose();
       root.replaceChildren();
     };
   }, [page]);
@@ -321,7 +303,7 @@ export default function Backstage({
     <div data-void className="fixed inset-0 touch-none overflow-hidden">
       <div ref={stage} className="absolute inset-0" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-4 font-mono text-xs text-muted">
-        <span className="bg-black/60 px-2 py-1">{cameraBlocked ? labels.noCamera : labels.walk}</span>
+        <span className="bg-black/60 px-2 py-1">{labels.walk}</span>
         <button
           onClick={() => exit.current()}
           className="pointer-events-auto border border-ink bg-black/60 px-3 py-2 text-ink hover:border-accent hover:bg-accent hover:text-bg"

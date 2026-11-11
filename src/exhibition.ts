@@ -1,13 +1,14 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { PROJECTS, type Lang } from "@/content";
+import { buildWalletHologram } from "@/hologram";
 
 export type Rect = { x: [number, number]; z: [number, number] };
 
 const CARPET = { z: -300, width: 300 };
 const WALKWAY = 800;
-const BOOTH = { width: 500, depth: 280, height: 460, gap: 40, space: 140 };
-const PANEL = { width: 420, height: 260, y: 230, px: 4, tilt: THREE.MathUtils.degToRad(5) };
+const BOOTH = { width: 500, depth: 280, height: 560, gap: 40, space: 140 };
+const PANEL = { width: 420, height: 260, y: 400, px: 4, tilt: THREE.MathUtils.degToRad(5) };
 const POST = { height: 100, every: 320 };
 const ROWS = Math.ceil(PROJECTS.length / 2);
 const HALL_START = -500 - WALKWAY;
@@ -153,6 +154,7 @@ export function buildExhibition(scene: THREE.Scene, lang: Lang) {
   const panelGeometry = keep(new THREE.PlaneGeometry(PANEL.width, PANEL.height));
   const walls: THREE.BufferGeometry[] = [];
   const bases: THREE.BufferGeometry[] = [];
+  let hologram: ReturnType<typeof buildWalletHologram> | undefined;
   const panels = PROJECTS.map((p, i) => {
     const side = i % 2 ? -1 : 1;
     const x = HALL_START - (BOOTH.width + BOOTH.space) * Math.floor(i / 2) - BOOTH.width / 2;
@@ -161,6 +163,12 @@ export function buildExhibition(scene: THREE.Scene, lang: Lang) {
     const far = near + side * BOOTH.depth;
     const wing = far - (side * sideDepth) / 2;
     bases.push(placed(baseGeometry, x, 4, middle));
+    if (p.slug === "usdc-wallet") {
+      hologram = buildWalletHologram("/booths/usdc-wallet.jpg", shaded, keep);
+      hologram.group.position.set(x, 8, near + side * 125);
+      hologram.group.rotation.y = side > 0 ? Math.PI : 0;
+      scene.add(hologram.group);
+    }
     floors.push(placed(floorGeometry, x, 0.3, CARPET.z + side * (CARPET.width / 2 + floorDepth / 2)));
     walls.push(
       placed(back, x, BOOTH.height / 2, far),
@@ -219,6 +227,11 @@ export function buildExhibition(scene: THREE.Scene, lang: Lang) {
     occluders: [occluder],
     panels: panels.map((b) => b.panel),
     redraw,
+    update: (seconds: number, viewer: THREE.Vector3) => {
+      if (!hologram) return;
+      hologram.group.visible = viewer.distanceTo(hologram.group.position) < 1800;
+      if (hologram.group.visible) hologram.update(seconds);
+    },
     dispose: () => disposables.forEach((d) => d.dispose()),
   };
 }
