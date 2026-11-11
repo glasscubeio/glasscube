@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { PROJECTS, UI, type L, type Lang } from "@/content";
+import { buildAlgorithmHologram } from "@/algorithms";
 import { buildBreezeHologram } from "@/breeze";
 import { buildChatHologram } from "@/chat";
 import { buildQrHologram } from "@/qr";
@@ -48,6 +49,7 @@ const HOLOGRAMS: Record<string, (shade: Shade, keep: Keep) => { group: THREE.Gro
   breeze: buildBreezeHologram,
   "secure-chat": buildChatHologram,
   "qr-studio": buildQrHologram,
+  "algorithm-visualizer": buildAlgorithmHologram,
 };
 
 function wrap(ctx: CanvasRenderingContext2D, text: string, width: number) {

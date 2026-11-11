@@ -10,7 +10,6 @@ const VIOLET = "#8f8cff";
 const SURFACE = "rgba(2, 18, 24, 0.9)";
 const PLATE: Plating = [TEAL, SURFACE];
 const ACT = 6;
-const CYCLE = ACT * 3;
 const WATCH = { x: 0, y: 170, z: 10, width: 90, height: 106, px: 5 };
 const OCEAN = { width: 400, depth: 200, y: 40 };
 const TAPS = [0.8, 1.1, 1.4];
@@ -115,6 +114,7 @@ function storm(a: number) {
 export function buildBreezeHologram(shade: Shade, keep: Keep) {
   const kit = hologram(keep, shade, new THREE.Color(TEAL), new THREE.Color(ICE));
   const { group, content, time, translucent, lines, mesh, outline, sparks } = kit;
+  const stage = kit.acts(3, ACT);
   const color = (hex: string) => new THREE.Color(hex);
 
   const ocean = mesh(
@@ -163,12 +163,7 @@ void main() {
   mesh(new THREE.PlaneGeometry(WATCH.width - 10, WATCH.height - 10), keep(new THREE.MeshBasicMaterial({ map: faceCanvas, transparent: true, depthWrite: false })), watch, 0, 0, 7.5);
   let shown = "";
 
-  const acts = [0, 1, 2].map(() => {
-    const act = new THREE.Group();
-    content.add(act);
-    return act;
-  });
-  const [sos, typhoon, fishing] = acts;
+  const [sos, typhoon, fishing] = stage.groups;
 
   const ripples = TAPS.map(() => mesh(new THREE.RingGeometry(6, 7.5, 48), translucent(0, color(ICE)), watch, 8, -12, 8));
   const badge = text([{ text: "SOS → 112", font: '600 64px "IBM Plex Mono", monospace', color: RED }], 640, 150, keep, [RED, SURFACE]);
@@ -234,14 +229,7 @@ void main() {
 
   const update = (seconds: number) => {
     kit.tick(seconds);
-    const cycle = seconds % CYCLE;
-    const act = Math.floor(cycle / ACT);
-    const a = cycle - act * ACT;
-    const presence = smoothstep(a, 0, 0.4) * (1 - smoothstep(a, ACT - 0.5, ACT));
-    acts.forEach((g, k) => {
-      g.visible = k === act;
-      g.scale.setScalar(Math.max(presence, 0.001));
-    });
+    const { act, at: a } = stage.show(seconds);
 
     const face = screen(act, a);
     const key = JSON.stringify(face);

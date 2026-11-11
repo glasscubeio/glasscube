@@ -193,11 +193,31 @@ void main() {
     return { sprite, show };
   };
 
+  const acts = (count: number, length: number) => {
+    const groups = Array.from({ length: count }, () => {
+      const act = new THREE.Group();
+      content.add(act);
+      return act;
+    });
+    const show = (seconds: number) => {
+      const cycle = seconds % (count * length);
+      const act = Math.floor(cycle / length);
+      const at = cycle - act * length;
+      const presence = THREE.MathUtils.smoothstep(at, 0, 0.4) * (1 - THREE.MathUtils.smoothstep(at, length - 0.5, length));
+      groups.forEach((g, k) => {
+        g.visible = k === act;
+        g.scale.setScalar(Math.max(presence, 0.001));
+      });
+      return { act, at };
+    };
+    return { groups, show };
+  };
+
   const tick = (seconds: number) => {
     time.value = seconds;
     content.position.y = Math.sin(seconds * 0.8) * 2.5;
     (core.material as THREE.MeshBasicMaterial).opacity = 0.75 + 0.2 * Math.sin(seconds * 3);
   };
 
-  return { group, content, time, translucent, lines, mesh, outline, sparks, sign, tick };
+  return { group, content, time, translucent, lines, mesh, outline, sparks, sign, acts, tick };
 }

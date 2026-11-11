@@ -15,7 +15,8 @@ import {
 } from "@/content";
 import { CATEGORY_ICONS, LOGOS } from "@/icons";
 
-const Backstage = lazy(() => import("@/Backstage"));
+const loadBackstage = () => import("@/Backstage");
+const Backstage = lazy(loadBackstage);
 
 const initialLang = (): Lang =>
   navigator.language.startsWith("ko") ? "ko" : "en";
@@ -289,6 +290,18 @@ function App() {
       year: "numeric",
       month: "short",
     });
+
+  useEffect(() => {
+    if (!matchMedia("(min-width: 40rem)").matches) return;
+    const prefetch = () => {
+      const run = () => void loadBackstage();
+      if ("requestIdleCallback" in window) requestIdleCallback(run);
+      else setTimeout(run, 200);
+    };
+    if (document.readyState === "complete") prefetch();
+    else addEventListener("load", prefetch, { once: true });
+    return () => removeEventListener("load", prefetch);
+  }, []);
 
   useEffect(() => {
     const onPop = () =>
