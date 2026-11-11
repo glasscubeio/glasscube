@@ -2,11 +2,14 @@ import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { PROJECTS, UI, type L, type Lang } from "@/content";
 import { buildAlgorithmHologram } from "@/algorithms";
+import { buildAnalyticsHologram } from "@/analytics";
+import { buildAntiyoyHologram } from "@/antiyoy";
 import { buildBreezeHologram } from "@/breeze";
 import { buildChatHologram } from "@/chat";
-import { buildQrHologram } from "@/qr";
 import type { Keep, Shade } from "@/hologram";
+import { buildQrHologram } from "@/qr";
 import { buildSchedulerHologram } from "@/scheduler";
+import { buildStrangerHologram } from "@/stranger";
 import { buildWalletHologram } from "@/wallet";
 
 export type Rect = { x: [number, number]; z: [number, number] };
@@ -50,6 +53,9 @@ const HOLOGRAMS: Record<string, (shade: Shade, keep: Keep) => { group: THREE.Gro
   "secure-chat": buildChatHologram,
   "qr-studio": buildQrHologram,
   "algorithm-visualizer": buildAlgorithmHologram,
+  analytics: buildAnalyticsHologram,
+  "hello-stranger": buildStrangerHologram,
+  antiyoy: buildAntiyoyHologram,
 };
 
 function wrap(ctx: CanvasRenderingContext2D, text: string, width: number) {
